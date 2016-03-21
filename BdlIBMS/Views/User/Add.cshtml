@@ -1,0 +1,89 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    app.controller('roleCtrl', function ($scope, $http) {
+        $scope.RoleName = "请选择角色！";
+        getRoles();
+
+        // 获取所有角色
+        function getRoles() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/roles"
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data;
+            }).error(function (data, status, headers, config) {
+                alert(data);
+                if (status == 401) {
+                    window.location.href = "../user/login";
+                }
+            });
+        }
+
+        // 添加用户
+        $scope.add = function () {
+            if ($scope.RoleID == undefined) {
+                alert("请先选择用户角色！");
+                return;
+            }
+
+            var params = {
+                "UserName": $("#UserName").val(),
+                "Password": $("#Password").val(),
+                "RoleID": $scope.RoleID
+            };
+            $http({
+                method: "post",
+                withCredentials: true,
+                url: "../api/users",
+                params: params
+            }).success(function (data, status, headers, config) {
+                window.location.href = "../user/list";
+            }).error(function (data, status, headers, config) {
+                alert(data);
+                if (status == 401) {
+                    window.location.href = "../user/login";
+                }
+            });
+        };
+
+        // 选择角色
+        $scope.select = function (uuid, roleName) {
+            $scope.RoleID = uuid;
+            $scope.RoleName = roleName;
+        }
+    });
+</script>
+<div ng-controller="roleCtrl">
+    <h2>添加用户</h2>
+    <form role="form">
+        <div class="form-group">
+            <label for="UserName">用户名称</label>
+            <input type="text" class="form-control" id="UserName" name="UserName" placeholder="请输入用户名称！">
+        </div>
+        <div class="form-group">
+            <label for="Password">用户密码</label>
+            <input type="password" class="form-control" id="Password" name="Password" placeholder="请输入用户密码！">
+        </div>
+        <div class="form-group">
+            <label>角色选择</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{RoleName}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-cloak ng-repeat="item in Items">
+                            <a href="#" ng-click="select(item.UUID,item.Name)">{{item.Name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-success" ng-click="add()">添加</button><br />
+</div>
+

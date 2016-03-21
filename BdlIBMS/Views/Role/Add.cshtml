@@ -1,0 +1,89 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    app.controller('roleCtrl', function ($scope, $http) {
+        getModules();
+
+        // 获取系统所有模块
+        function getModules() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/modules"
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data;
+            }).error(function (data, status, headers, config) {
+                alert(data);
+                if (status == 401) {
+                    window.location.href = "../user/login";
+                }
+            });
+        }
+
+        // 添加角色
+        $scope.add = function () {
+            var modules = "";
+            $(".jumbotron .row").each(function () {
+                var mine = $(this);
+                // mine.children()[1] 通过这种方式获得的是dom元素
+                // 如果需要获取一个JQuery对象使用下面的方式 $(mine.children()[1])
+                var uuid = $(mine.children()[1]).val();
+                var canRead = $($(mine.children()[2]).children()[0]).is(":checked");
+                var canWrite = $($(mine.children()[3]).children()[0]).is(":checked");
+                modules += uuid + ":" + canRead + ":" + canWrite + ",";
+            });
+            // 去掉最后一个逗号
+            modules = modules.substring(0,modules.length-1); 
+
+            var params = {
+                "Name": $("#Name").val(),
+                "Description": $("#Description").val(),
+                "Modules":modules
+            };
+            $http({
+                method: "post",
+                withCredentials: true,
+                url: "../api/roles",
+                params: params
+            }).success(function (data, status, headers, config) {
+                window.location.href = "../role/list";
+            }).error(function (data, status, headers, config) {
+                alert(data);
+                if (status == 401) {
+                    window.location.href = "../user/login";
+                }
+            });
+        };
+    });
+</script>
+<div ng-controller="roleCtrl">
+    <h2>添加角色</h2>
+    <form role="form">
+        <div class="form-group">
+            <label for="Name">角色名称</label>
+            <input type="text" class="form-control" id="Name" name="Name" placeholder="请输入角色名称！">
+        </div>
+        <div class="form-group">
+            <label for="Description">角色描述</label>
+            <textarea cols="30" rows="5" class="form-control" id="Description" name="Description" placeholder="请输入角色描述！"></textarea>
+        </div>
+        <div class="form-group">
+            <label>模块系统选择</label>
+            <div class="jumbotron">
+                <div class="row" style="margin-top:10px;" ng-cloak ng-repeat="item in Items">
+                    <div class="col-md-3">{{item.Name}}</div>
+                    <input type="hidden" value="{{item.UUID}}"/>
+                    <div class="col-md-4">
+                        <input type="checkbox">&nbsp;浏览（读）权限
+                    </div>
+                    <div class="col-md-4">
+                        <input type="checkbox">&nbsp;控制（写）权限
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-success" ng-click="add()">添加</button><br />
+</div>
+    

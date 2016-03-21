@@ -1,0 +1,76 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    app.controller('moduleCtrl', function ($scope, $http) {
+        // 获取系统模块数据列表
+        getModuleInfos();
+
+        function getModuleInfos() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/modules"
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data;
+            }).error(function (data, status, headers, config) {
+                alert(data);
+                if (status == 401) {
+                    window.location.href = "../user/login";
+                }
+            });
+        }
+
+        // 删除模块系统
+        $scope.deleteModule = function (uuid) {
+            if (confirm("确定删除该模块系统吗？")) {
+                $http({
+                    method: "delete",
+                    withCredentials: true,
+                    url: "../api/modules/" + uuid
+                }).success(function (data, status, headers, config) {
+                    alert("模块删除成功！");
+                    getModuleInfos();
+                }).error(function (data, status, headers, config) {
+                    alert(data);
+                    if (status == 401) {
+                        window.location.href = "../user/login";
+                    }
+                });
+            }
+        };
+    });
+</script>
+
+<div ng-controller="moduleCtrl">
+    <table class="table table-hover">
+        <caption>
+             <h2>系统模块管理</h2>
+            <a href="~/module/add" class="btn btn-success" style="float:right;">添加</a>
+        </caption>
+        <thead>
+            <tr>
+                <th>UUID</th>
+                <th>名称</th>
+                <th>描述</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-cloak ng-repeat="item in Items">
+                <td>{{item.UUID}}</td>
+                <td>{{item.Name}}</td>
+                <td>{{item.Description}}</td>
+                <td>{{item.Remark}}</td>
+                <td>
+                    <a href="~/module/modify?uuid={{item.UUID}}" class="btn btn-warning">修改</a>
+                    <button type="button" class="btn btn-danger" ng-click="deleteModule(item.UUID)">删除</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+    

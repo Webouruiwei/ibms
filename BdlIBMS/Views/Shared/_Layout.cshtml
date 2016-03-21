@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-2.2.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/init.js"></script>
+    <title></title>
+</head>
+<body ng-app="app">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="~/home/index">百德朗IBMS系统</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="~/user/list" class="active">用户管理</a></li>
+                    <li><a href="~/role/list">角色管理</a></li>
+                    <li><a href="~/module/list">模块管理</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="margin-top:51px;">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - 百德朗IBMS系统&nbsp;<a href="/elmah.axd">ELMAH error log</a></p>
+        </footer>
+    </div>
+</body>
+</html>

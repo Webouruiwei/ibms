@@ -1,0 +1,76 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    app.controller('userCtrl', function ($scope, $http) {
+        // 获取系统模块数据列表
+        getUsers();
+
+        function getUsers() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/users"
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data;
+            }).error(function (data, status, headers, config) {
+                alert(data);
+                if (status == 401) {
+                    window.location.href = "../user/login";
+                }
+            });
+        }
+
+        // 删除用户
+        $scope.delete = function (uuid) {
+            if (confirm("确定删除该用户吗？")) {
+                $http({
+                    method: "delete",
+                    withCredentials: true,
+                    url: "../api/users/" + uuid
+                }).success(function (data, status, headers, config) {
+                    alert("用户删除成功！");
+                    getUsers();
+                }).error(function (data, status, headers, config) {
+                    alert(data);
+                    if (status == 401) {
+                        window.location.href = "../user/login";
+                    }
+                });
+            }
+        };
+    });
+</script>
+
+<div ng-controller="userCtrl">
+    <table class="table table-hover">
+        <caption>
+            <h2>用户管理</h2>
+            <a href="~/user/add" class="btn btn-success" style="float:right;">添加</a>
+        </caption>
+        <thead>
+            <tr>
+                <th>UUID</th>
+                <th>用户名</th>
+                <th>密码</th>
+                <th>角色名</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-cloak ng-repeat="item in Items">
+                <td>{{item.UUID}}</td>
+                <td>{{item.UserName}}</td>
+                <td>{{item.Password}}</td>
+                <td>{{item.RoleName}}</td>
+                <td>
+                    <a href="~/user/modify?uuid={{item.UUID}}" class="btn btn-warning">修改</a>
+                    <button type="button" class="btn btn-danger" ng-click="delete(item.UUID)">删除</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+

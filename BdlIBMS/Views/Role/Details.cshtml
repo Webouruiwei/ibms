@@ -1,0 +1,85 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    app.controller('roleCtrl', function ($scope, $http) {
+        getRoleInfos();
+
+        // 获取系统所有模块
+        function getRoleInfos() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/roles/" + getQueryString("uuid")
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data;
+                if(data!=null){
+                    $scope.Name = data[0].Name;
+                    $scope.Description = data[0].Description;
+                }
+            }).error(function (data, status, headers, config) {
+                alert(data);
+                if (status == 401) {
+                    window.location.href = "../user/login";
+                }
+            });
+        }
+
+        // 删除角色模块系统
+        $scope.delete = function (id) {
+            if (confirm("确定删除该角色模块系统吗？")) {
+                $http({
+                    method: "delete",
+                    withCredentials: true,
+                    url: "../api/roles/" + id
+                }).success(function (data, status, headers, config) {
+                    alert("角色模块系统删除成功！");
+                    getRoleInfos();
+                }).error(function (data, status, headers, config) {
+                    alert(data);
+                    if (status == 401) {
+                        window.location.href = "../user/login";
+                    }
+                });
+            }
+        };
+    });
+</script>
+<div ng-controller="roleCtrl">
+    <h2>{{Name}}</h2><br />
+    <div role="form">
+        <div class="form-group">
+            <label for="Description">角色描述</label>
+            <textarea cols="30" rows="5" class="form-control" id="Description" readonly="readonly">{{Description}}</textarea>
+        </div>
+        <div class="form-group">
+            <table class="table table-hover">
+                <caption>
+                    <h3>管理模块一览</h3>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>模块UUID</th>
+                        <th>模块名称</th>
+                        <th>是否拥有读权限</th>
+                        <th>是否拥有写权限</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody ng-cloak ng-repeat="item in Items">
+                    <tr>
+                        <td>{{item.ModuleID}}</td>
+                        <td>{{item.ModuleName}}</td>
+                        <td>{{item.CanRead}}</td>
+                        <td>{{item.CanWrite}}</td>
+                        <td>
+                            <a href="#" class="btn btn-warning">修改</a>
+                            <button type="button" class="btn btn-danger" ng-click="delete(item.ID)">删除</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+   </div>
+</div>
+    
