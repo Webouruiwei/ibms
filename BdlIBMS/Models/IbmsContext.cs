@@ -26,7 +26,8 @@ namespace BdlIBMS.Models
             modelBuilder.Entity<Module>()
                 .HasMany(e => e.Roles)
                 .WithRequired(e => e.Module)
-                .HasForeignKey(e => e.ModuleID);
+                .HasForeignKey(e => e.ModuleID)
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Role>()
                 .Property(e => e.UUID)

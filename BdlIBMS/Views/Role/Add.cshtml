@@ -14,10 +14,7 @@
             }).success(function (data, status, headers, config) {
                 $scope.Items = data;
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         }
 
@@ -49,10 +46,7 @@
             }).success(function (data, status, headers, config) {
                 window.location.href = "../role/list";
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         };
     });
@@ -71,9 +65,9 @@
         <div class="form-group">
             <label>模块系统选择</label>
             <div class="jumbotron">
-                <div class="row" style="margin-top:10px;" ng-cloak ng-repeat="item in Items">
+                <div class="row" style="margin-top:10px;" ng-cloak ng-repeat="item in Items" ng-if="item.Status">
                     <div class="col-md-3">{{item.Name}}</div>
-                    <input type="hidden" value="{{item.UUID}}"/>
+                    <input type="hidden" value="{{item.UUID}}" />
                     <div class="col-md-4">
                         <input type="checkbox">&nbsp;浏览（读）权限
                     </div>

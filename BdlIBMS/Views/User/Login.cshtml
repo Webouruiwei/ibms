@@ -7,9 +7,11 @@
     <meta name="renderer" content="webkit">
     <title>欢迎登陆</title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-2.2.1.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
     <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/utils.js"></script>
     <script type="text/javascript">
         $(function () {
             $("#btnLogin").click(function () {
@@ -29,10 +31,10 @@
                         if (textStatus == "success")
                             window.location.href = "../home/index";
                         else
-                            alert("用户名或密码错误！");
+                            ShowTipsModel("用户名或密码错误！");
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert(errorThrown);
+                        ShowTipsModel("用户名或密码错误！");
                     }
                 });
             });
@@ -53,6 +55,26 @@
             </div>
         </form>
         <button class="btn btn-default" id="btnLogin">登录</button>
+        @*消息提示框*@
+        <div class="modal fade" id="commontiperrModal">
+            <div class="modal-dialog" style="width:400px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="model-msg-title"><i class="fa fa-times-circle"></i><span style="margin-left: 2px;">错误提示</span></h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="showerrTitle" style="font-size: 16px;"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="modelClose" style="height: 36px;"
+                                data-dismiss="modal">
+                            关闭
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

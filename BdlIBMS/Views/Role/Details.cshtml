@@ -18,30 +18,24 @@
                     $scope.Description = data[0].Description;
                 }
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         }
 
         // 删除角色模块系统
         $scope.delete = function (id) {
-            if (confirm("确定删除该角色模块系统吗？")) {
+            ShowConfirmModal("确定删除该角色模块系统吗？", function () {
                 $http({
                     method: "delete",
                     withCredentials: true,
                     url: "../api/roles/" + id
                 }).success(function (data, status, headers, config) {
-                    alert("角色模块系统删除成功！");
+                    ShowTipsModel("角色模块系统删除成功！");
                     getRoleInfos();
                 }).error(function (data, status, headers, config) {
-                    alert(data);
-                    if (status == 401) {
-                        window.location.href = "../user/login";
-                    }
+                    ShowErrModal(data, status);
                 });
-            }
+            });
         };
     });
 </script>
@@ -66,7 +60,7 @@
                         <th>操作</th>
                     </tr>
                 </thead>
-                <tbody ng-cloak ng-repeat="item in Items">
+                <tbody ng-cloak ng-repeat="item in Items" ng-if="item.ModuleStatus">
                     <tr>
                         <td>{{item.ModuleID}}</td>
                         <td>{{item.ModuleName}}</td>

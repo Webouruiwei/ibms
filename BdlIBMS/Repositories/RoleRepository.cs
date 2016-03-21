@@ -31,10 +31,12 @@ namespace BdlIBMS.Repositories
                                   UUID = item.UUID,
                                   ModuleID = item.ModuleID,
                                   ModuleName = item.Module.Name,
+                                  ModuleStatus = item.Module.Status,
                                   Name = item.Name,
                                   Description = item.Description,
                                   CanRead = item.CanRead,
                                   CanWrite = item.CanWrite,
+                                  Status = item.Status,
                                   Remark = item.Remark
                               };
             return results;
@@ -45,8 +47,9 @@ namespace BdlIBMS.Repositories
             foreach (dynamic item in roles)
             {
                 Role role = await GetByIdAsync(item.ID);
+                role.Status = false;
                 if (role != null)
-                    this.db.Roles.Remove(role);
+                    db.Entry(role).State = EntityState.Modified;
             }
             await this.db.SaveChangesAsync();
         }

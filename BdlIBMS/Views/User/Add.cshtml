@@ -15,17 +15,14 @@
             }).success(function (data, status, headers, config) {
                 $scope.Items = data;
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         }
 
         // 添加用户
         $scope.add = function () {
             if ($scope.RoleID == undefined) {
-                alert("请先选择用户角色！");
+                ShowTipsModel("请先选择用户角色！");
                 return;
             }
 
@@ -40,12 +37,10 @@
                 url: "../api/users",
                 params: params
             }).success(function (data, status, headers, config) {
+                ShowTipsModel("用户添加成功！");
                 window.location.href = "../user/list";
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         };
 
@@ -76,7 +71,7 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li ng-cloak ng-repeat="item in Items">
+                        <li ng-cloak ng-repeat="item in Items" ng-if="item.Status">
                             <a href="#" ng-click="select(item.UUID,item.Name)">{{item.Name}}</a>
                         </li>
                     </ul>

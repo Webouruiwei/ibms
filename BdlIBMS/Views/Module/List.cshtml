@@ -14,30 +14,24 @@
             }).success(function (data, status, headers, config) {
                 $scope.Items = data;
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         }
 
         // 删除模块系统
         $scope.deleteModule = function (uuid) {
-            if (confirm("确定删除该模块系统吗？")) {
+            ShowConfirmModal("确定删除该模块系统吗？", function () {
                 $http({
                     method: "delete",
                     withCredentials: true,
                     url: "../api/modules/" + uuid
                 }).success(function (data, status, headers, config) {
-                    alert("模块删除成功！");
+                    ShowTipsModel("模块删除成功！");
                     getModuleInfos();
                 }).error(function (data, status, headers, config) {
-                    alert(data);
-                    if (status == 401) {
-                        window.location.href = "../user/login";
-                    }
+                    ShowErrModal(data, status);
                 });
-            }
+            });
         };
     });
 </script>
@@ -58,7 +52,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-cloak ng-repeat="item in Items">
+            <tr ng-cloak ng-repeat="item in Items" ng-if="item.Status">
                 <td>{{item.UUID}}</td>
                 <td>{{item.Name}}</td>
                 <td>{{item.Description}}</td>

@@ -14,30 +14,24 @@
             }).success(function (data, status, headers, config) {
                 $scope.Items = data;
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         }
 
         // 删除角色
         $scope.delete = function (uuid) {
-            if (confirm("确定删除该角色吗？")) {
+            ShowConfirmModal("确定删除该角色吗？", function () {
                 $http({
                     method: "delete",
                     withCredentials: true,
                     url: "../api/roles/" + uuid
                 }).success(function (data, status, headers, config) {
-                    alert("角色删除成功！");
+                    ShowTipsModel("角色删除成功！");
                     getInfos();
                 }).error(function (data, status, headers, config) {
-                    alert(data);
-                    if (status == 401) {
-                        window.location.href = "../user/login";
-                    }
+                    ShowErrModal(data, status);
                 });
-            }
+            });
         };
     });
 </script>
@@ -57,7 +51,7 @@
                 <th>操作</th>
             </tr>
         </thead>
-        <tbody ng-cloak ng-repeat="item in Items">
+        <tbody ng-cloak ng-repeat="item in Items" ng-if="item.Status">
             <tr>
                 <td>{{item.UUID}}</td>
                 <td>{{item.Name}}</td>

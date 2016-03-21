@@ -39,12 +39,13 @@ namespace BdlIBMS.Controllers
                             UUID = item.UUID,
                             Name = item.Name,
                             Description = item.Description,
+                            Status = item.Status,
                             Remark = item.Remark
                         };
             return Ok(items);
         }
 
-        // GET: api/Modules/5
+        // GET: api/Modules/13cbc2e968bb42a5a60a59742c8684cc
         [ResponseType(typeof(Module))]
         public async Task<IHttpActionResult> GetModule(string uuid)
         {
@@ -61,13 +62,14 @@ namespace BdlIBMS.Controllers
                 UUID = module.UUID,
                 Name = module.Name,
                 Description = module.Description,
+                Status = module.Status,
                 Remark = module.Remark
             };
 
             return Ok(result);
         }
 
-        // PUT: api/Modules/5
+        // PUT: api/Modules/13cbc2e968bb42a5a60a59742c8684cc
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutModule(string uuid, [FromUri]Module module)
         {
@@ -80,6 +82,7 @@ namespace BdlIBMS.Controllers
 
             try
             {
+                module.Status = true;
                 await this.repository.PutAsync(module);
             }
             catch (DbUpdateConcurrencyException)
@@ -102,6 +105,7 @@ namespace BdlIBMS.Controllers
                 return errResult;
 
             module.UUID = BdlIBMS.Utils.TextHelper.GenerateUUID();
+            module.Status = true; // 默认添加的时候该模块是可用的
             try
             {
                 await this.repository.AddAsync(module);
@@ -117,8 +121,7 @@ namespace BdlIBMS.Controllers
             return Ok();
         }
 
-        // DELETE: api/Modules/5
-        [ResponseType(typeof(Module))]
+        // DELETE: api/Modules/13cbc2e968bb42a5a60a59742c8684cc
         public async Task<IHttpActionResult> DeleteModule(string uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
@@ -129,7 +132,26 @@ namespace BdlIBMS.Controllers
             if (module == null)
                 return NotFound();
 
-            await this.repository.DeleteAsync(module);
+            module.Status = false; // 设置该模块不可用
+            await this.repository.PutAsync(module);
+
+            return Ok();
+        }
+
+        [Route("api/modules/reset/{uuid}")]
+        [ResponseType(typeof(Module))]
+        public async Task<IHttpActionResult> ResetModule(string uuid)
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            Module module = await this.repository.GetByIdAsync(uuid);
+            if (module == null)
+                return NotFound();
+
+            module.Status = true; // 重置该模块为可用状态
+            await this.repository.PutAsync(module);
 
             return Ok(module);
         }

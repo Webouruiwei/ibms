@@ -19,10 +19,7 @@
                 if (status == 200)
                     window.location.href = "../module/list";
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         };
     });

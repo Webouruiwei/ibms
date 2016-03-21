@@ -14,10 +14,7 @@
             }).success(function (data, status, headers, config) {
                 $scope.Item = data;
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         }
 
@@ -35,13 +32,10 @@
                 url: "../api/modules/" + getQueryString("uuid"),
                 params: params
             }).success(function (data, status, headers, config) {
-                alert("模块信息修改成功！");
+                ShowTipsModel("模块信息修改成功！");
                 window.location.href = "../module/list";
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         };
     });

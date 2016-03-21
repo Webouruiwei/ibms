@@ -25,6 +25,8 @@ namespace BdlIBMS.Models
         [StringLength(100)]
         public string Password { get; set; }
 
+        public bool? Status { get; set; }
+
         [StringLength(255)]
         public string Remark { get; set; }
     }

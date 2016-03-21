@@ -14,30 +14,24 @@
             }).success(function (data, status, headers, config) {
                 $scope.Items = data;
             }).error(function (data, status, headers, config) {
-                alert(data);
-                if (status == 401) {
-                    window.location.href = "../user/login";
-                }
+                ShowErrModal(data, status);
             });
         }
 
         // 删除用户
         $scope.delete = function (uuid) {
-            if (confirm("确定删除该用户吗？")) {
+            ShowConfirmModal("确定删除该用户吗？", function () {
                 $http({
                     method: "delete",
                     withCredentials: true,
                     url: "../api/users/" + uuid
                 }).success(function (data, status, headers, config) {
-                    alert("用户删除成功！");
+                    ShowTipsModel("用户删除成功！");
                     getUsers();
                 }).error(function (data, status, headers, config) {
-                    alert(data);
-                    if (status == 401) {
-                        window.location.href = "../user/login";
-                    }
+                    ShowErrModal(data, status);
                 });
-            }
+            });
         };
     });
 </script>
@@ -58,7 +52,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-cloak ng-repeat="item in Items">
+            <tr ng-cloak ng-repeat="item in Items" ng-if="item.Status">
                 <td>{{item.UUID}}</td>
                 <td>{{item.UserName}}</td>
                 <td>{{item.Password}}</td>

@@ -24,6 +24,7 @@ namespace BdlIBMS.Controllers
             public string UserName { get; set; }
             public string Password { get; set; }
             public string RoleName { get; set; }
+            public bool Status { get; set; }
             public string Remark { get; set; }
         }
 
@@ -31,7 +32,10 @@ namespace BdlIBMS.Controllers
         IRepository<string, UserInfo> userInfoRepository;
         IRoleRepository roleRepository;
 
-        public UsersController(IUserRepository userRepository, IRepository<string, UserInfo> userInfoRepository, IRoleRepository roleRepository)
+        public UsersController(
+            IUserRepository userRepository,
+            IRepository<string, UserInfo> userInfoRepository,
+            IRoleRepository roleRepository)
         {
             this.userRepository = userRepository;
             this.userInfoRepository = userInfoRepository;
@@ -54,6 +58,7 @@ namespace BdlIBMS.Controllers
                 user.UserName = item.UserName;
                 user.Password = item.Password;
                 user.RoleName = this.roleRepository.FindRoleNameByUUID(item.RoleID);
+                user.Status = item.Status ?? true;
                 user.Remark = item.Remark;
                 list.Add(user);
             }
@@ -61,7 +66,7 @@ namespace BdlIBMS.Controllers
             return Ok(list);
         }
 
-        // GET: api/Users/5
+        // GET: api/Users/561169739ed84672a49edadb45d01000
         [ResponseType(typeof(User))]
         public async Task<IHttpActionResult> GetUser(string uuid)
         {
@@ -83,12 +88,14 @@ namespace BdlIBMS.Controllers
             User user = this.userRepository.FindByUserNameAndPassword(userName, password);
             if (user == null)
                 return NotFound();
+
             UserInfo userInfo = await this.userInfoRepository.GetByIdAsync(user.UUID);
             HttpContext.Current.Session["mySession"] = userInfo;
+
             return Ok();
         }
 
-        // PUT: api/Users/5
+        // PUT: api/Users/561169739ed84672a49edadb45d01000
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutUser(string uuid, User user)
         {
@@ -101,6 +108,7 @@ namespace BdlIBMS.Controllers
 
             try
             {
+                user.Status = true;
                 await this.userRepository.PutAsync(user);
             }
             catch (DbUpdateConcurrencyException)
@@ -126,7 +134,9 @@ namespace BdlIBMS.Controllers
             user.Password = TextHelper.MD5Encrypt(user.Password);
             try
             {
+                user.Status = true;
                 await this.userRepository.AddAsync(user);
+
                 UserInfo userInfo = new UserInfo();
                 userInfo.UUID = user.UUID;
                 userInfo.RealName = "请填写你的真实名字！";
@@ -144,8 +154,7 @@ namespace BdlIBMS.Controllers
             return Ok(user);
         }
 
-        // DELETE: api/Users/5
-        [ResponseType(typeof(User))]
+        // DELETE: api/Users/561169739ed84672a49edadb45d01000
         public async Task<IHttpActionResult> DeleteUser(string uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
@@ -155,12 +164,27 @@ namespace BdlIBMS.Controllers
             User user = await this.userRepository.GetByIdAsync(uuid);
             if (user == null)
                 return NotFound();
-            UserInfo userInfo = await this.userInfoRepository.GetByIdAsync(uuid);
-            if (userInfo == null)
+
+            user.Status = false;
+            await this.userRepository.PutAsync(user);
+
+            return Ok();
+        }
+
+        [Route("api/users/reset/{uuid}")]
+        [ResponseType(typeof(User))]
+        public async Task<IHttpActionResult> ResetUser(string uuid)
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            User user = await this.userRepository.GetByIdAsync(uuid);
+            if (user == null)
                 return NotFound();
 
-            await this.userRepository.DeleteAsync(user);
-            await this.userInfoRepository.DeleteAsync(userInfo);
+            user.Status = true;
+            await this.userRepository.PutAsync(user);
 
             return Ok(user);
         }

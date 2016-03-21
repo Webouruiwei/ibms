@@ -22,7 +22,7 @@ namespace BdlIBMS.Repositories
         public User FindByUserNameAndPassword(string userName, string password)
         {
             string encryptPwd = TextHelper.MD5Encrypt(password);
-            User user = this.db.Users.FirstOrDefault((u) => u.UserName == userName && u.Password == encryptPwd);
+            User user = this.db.Users.FirstOrDefault((u) => u.Status==true && u.UserName == userName && u.Password == encryptPwd);
             return user;
         }
     }

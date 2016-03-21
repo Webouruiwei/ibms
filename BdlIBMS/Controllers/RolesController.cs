@@ -39,6 +39,7 @@ namespace BdlIBMS.Controllers
                             UUID = item.UUID,
                             Name = item.Name,
                             Description = item.Description,
+                            Status = item.Status,
                             Remark = item.Remark
                         } into newItem
                         select new
@@ -46,6 +47,7 @@ namespace BdlIBMS.Controllers
                             UUID = newItem.Key.UUID,
                             Name = newItem.Key.Name,
                             Description = newItem.Key.Description,
+                            Status = newItem.Key.Status,
                             Remark = newItem.Key.Remark
                         };
             return Ok(items);
@@ -130,6 +132,7 @@ namespace BdlIBMS.Controllers
                 role.ModuleID = itemAry[0];
                 role.CanRead = Convert.ToBoolean(itemAry[1]);
                 role.CanWrite = Convert.ToBoolean(itemAry[2]);
+                role.Status = true;
                 if (!role.CanRead && !role.CanWrite)
                     continue;
                 await this.repository.AddAsync(role);
@@ -139,7 +142,6 @@ namespace BdlIBMS.Controllers
         }
 
         // DELETE: api/Roles/5
-        [ResponseType(typeof(Role))]
         [Route("api/roles/{id:int}")]
         public async Task<IHttpActionResult> DeleteRole(int id)
         {
@@ -151,9 +153,10 @@ namespace BdlIBMS.Controllers
             if (role == null)
                 return NotFound();
 
-            await this.repository.DeleteAsync(role);
+            role.Status = false;
+            await this.repository.PutAsync(role);
 
-            return Ok(role);
+            return Ok();
         }
 
         // DELETE: api/Roles/9a003d14b1844f3892c44efe08d12593
