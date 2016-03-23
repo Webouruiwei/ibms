@@ -13,6 +13,8 @@ namespace BdlIBMS.Repositories
 
         string FindRoleNameByUUID(string uuid);
 
-        Task DeleteRolesAsync(IEnumerable<dynamic> roles);
+        Task ModifyRolesStatusAsync(IEnumerable<dynamic> roles, bool status);
+
+        Task ModifyRolesBasicAsync(IEnumerable<dynamic> roles, string name, string description);
     }
 }

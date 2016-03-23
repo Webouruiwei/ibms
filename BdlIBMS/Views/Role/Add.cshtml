@@ -2,6 +2,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script type="text/javascript">
+    var activeIndexs = ["RoleManager"];
+
     app.controller('roleCtrl', function ($scope, $http) {
         getModules();
 
@@ -12,7 +14,7 @@
                 withCredentials: true,
                 url: "../api/modules"
             }).success(function (data, status, headers, config) {
-                $scope.Items = data;
+                $scope.Items = data.Items;
             }).error(function (data, status, headers, config) {
                 ShowErrModal(data, status);
             });
@@ -52,7 +54,7 @@
     });
 </script>
 <div ng-controller="roleCtrl">
-    <h2>添加角色</h2>
+    <h2>添加角色</h2><br />
     <form role="form">
         <div class="form-group">
             <label for="Name">角色名称</label>

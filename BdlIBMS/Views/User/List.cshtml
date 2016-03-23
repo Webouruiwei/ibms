@@ -2,6 +2,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script type="text/javascript">
+    var activeIndexs = ["UserManager"];
+
     app.controller('userCtrl', function ($scope, $http) {
         // 获取系统模块数据列表
         getUsers();
@@ -18,15 +20,23 @@
             });
         }
 
-        // 删除用户
-        $scope.delete = function (uuid) {
-            ShowConfirmModal("确定删除该用户吗？", function () {
+        // 修正用户状态
+        $scope.modifyUserStatus = function (uuid, status) {
+            var msg;
+            if (!status) {
+                msg = "确定要禁用该用户吗？";
+            } else {
+                msg = "确定要启用该用户吗？";
+            }
+
+            ShowConfirmModal(msg, function () {
                 $http({
-                    method: "delete",
+                    method: "post",
                     withCredentials: true,
-                    url: "../api/users/" + uuid
+                    url: "../api/users/status/" + uuid,
+                    params: { "Status": status }
                 }).success(function (data, status, headers, config) {
-                    ShowTipsModel("用户删除成功！");
+                    ShowTipsModel("用户状态修改成功！");
                     getUsers();
                 }).error(function (data, status, headers, config) {
                     ShowErrModal(data, status);
@@ -52,14 +62,17 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-cloak ng-repeat="item in Items" ng-if="item.Status">
+            <tr ng-cloak ng-repeat="item in Items">
                 <td>{{item.UUID}}</td>
                 <td>{{item.UserName}}</td>
                 <td>{{item.Password}}</td>
                 <td>{{item.RoleName}}</td>
-                <td>
+                <td ng-if="item.Status">
                     <a href="~/user/modify?uuid={{item.UUID}}" class="btn btn-warning">修改</a>
-                    <button type="button" class="btn btn-danger" ng-click="delete(item.UUID)">删除</button>
+                    <button type="button" class="btn btn-danger" ng-click="modifyUserStatus(item.UUID,false)">禁用</button>
+                </td>
+                <td ng-if="!item.Status">
+                    <button type="button" class="btn btn-success" ng-click="modifyUserStatus(item.UUID,true)">启用</button>
                 </td>
             </tr>
         </tbody>

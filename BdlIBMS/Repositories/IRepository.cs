@@ -22,6 +22,14 @@ namespace BdlIBMS.Repositories
         DbSet<T> GetAll();
 
         /// <summary>
+        /// 获取分页数据。
+        /// </summary>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        IEnumerable<T> GetPagerItems<TKey>(int pageIndex, int pageSize,Func<T,TKey> func);
+
+        /// <summary>
         /// 通过UUID获取指定数据项。
         /// </summary>
         /// <param name="uuid"></param>
@@ -48,6 +56,12 @@ namespace BdlIBMS.Repositories
         /// <param name="item"></param>
         /// <returns></returns>
         Task DeleteAsync(T item);
+
+        /// <summary>
+        /// 获取数据总条数。
+        /// </summary>
+        /// <returns></returns>
+        int GetCount();
 
         /// <summary>
         /// 判断指定UUID的数据项是否存在。

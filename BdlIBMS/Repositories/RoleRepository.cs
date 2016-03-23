@@ -42,12 +42,25 @@ namespace BdlIBMS.Repositories
             return results;
         }
 
-        public async Task DeleteRolesAsync(IEnumerable<dynamic> roles)
+        public async Task ModifyRolesStatusAsync(IEnumerable<dynamic> roles, bool status)
         {
             foreach (dynamic item in roles)
             {
                 Role role = await GetByIdAsync(item.ID);
-                role.Status = false;
+                role.Status = status;
+                if (role != null)
+                    db.Entry(role).State = EntityState.Modified;
+            }
+            await this.db.SaveChangesAsync();
+        }
+
+        public async Task ModifyRolesBasicAsync(IEnumerable<dynamic> roles, string name, string description)
+        {
+            foreach (dynamic item in roles)
+            {
+                Role role = await GetByIdAsync(item.ID);
+                role.Name = name;
+                role.Description = description;
                 if (role != null)
                     db.Entry(role).State = EntityState.Modified;
             }

@@ -18,11 +18,13 @@ namespace BdlIBMS.Controllers
 {
     public class RolesController : ApiController
     {
-        IRoleRepository repository;
+        IRoleRepository roleRepository;
+        IRepository<string, Module> moduleRepository;
 
-        public RolesController(IRoleRepository repository)
+        public RolesController(IRoleRepository roleRepository, IRepository<string, Module> moduleRepository)
         {
-            this.repository = repository;
+            this.roleRepository = roleRepository;
+            this.moduleRepository = moduleRepository;
         }
 
         // GET: api/Roles
@@ -32,7 +34,7 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            var results = this.repository.GetAll();
+            var results = this.roleRepository.GetAll();
             var items = from item in results
                         group item by new
                         {
@@ -62,7 +64,7 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            Role role = await this.repository.GetByIdAsync(id);
+            Role role = await this.roleRepository.GetByIdAsync(id);
             if (role == null)
                 return NotFound();
 
@@ -76,11 +78,49 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            IEnumerable<dynamic> roles = this.repository.FindRolesByUUID(uuid);
+            IEnumerable<dynamic> roles = this.roleRepository.FindRolesByUUID(uuid);
             if (roles == null)
                 return NotFound();
 
             return Ok(roles);
+        }
+
+        /// <summary>
+        /// 获取指定角色可供选择的其他模块系统。
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        [Route("api/roles/additional_modules/{uuid}")]
+        [HttpGet]
+        public IHttpActionResult GetRoleAdditionModules(string uuid)
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            IEnumerable<Module> modules = this.moduleRepository.GetAll();
+            IEnumerable<dynamic> roles = this.roleRepository.FindRolesByUUID(uuid);
+            List<dynamic> additions = new List<dynamic>();
+            foreach (Module module in modules)
+            {
+                bool status = module.Status ?? false;
+                if (!status)
+                    continue;
+
+                bool isContain = false;
+                foreach (var role in roles)
+                {
+                    if (module.UUID == role.ModuleID)
+                    {
+                        isContain = true;
+                        break;
+                    }
+                }
+                if (!isContain)
+                    additions.Add(new { ModuleID = module.UUID, ModuleName = module.Name });
+            }
+
+            return Ok(additions);
         }
 
         // PUT: api/Roles/5
@@ -96,11 +136,11 @@ namespace BdlIBMS.Controllers
 
             try
             {
-                await this.repository.PutAsync(role);
+                await this.roleRepository.PutAsync(role);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!this.repository.IsExist(id))
+                if (!this.roleRepository.IsExist(id))
                     return NotFound();
                 else
                     throw;
@@ -110,7 +150,6 @@ namespace BdlIBMS.Controllers
         }
 
         // POST: api/Roles
-        [ResponseType(typeof(Role))]
         public async Task<IHttpActionResult> PostRole()
         {
             var errResult = TextHelper.CheckAuthorized(Request);
@@ -135,8 +174,21 @@ namespace BdlIBMS.Controllers
                 role.Status = true;
                 if (!role.CanRead && !role.CanWrite)
                     continue;
-                await this.repository.AddAsync(role);
+                await this.roleRepository.AddAsync(role);
             }
+
+            return Ok();
+        }
+
+        [Route("api/roles/add_module")]
+        [HttpPost]
+        public async Task<IHttpActionResult> PostRoleModule([FromUri] Role roleModule)
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            await this.roleRepository.AddAsync(roleModule);
 
             return Ok();
         }
@@ -149,25 +201,58 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            Role role = await this.repository.GetByIdAsync(id);
+            Role role = await this.roleRepository.GetByIdAsync(id);
             if (role == null)
                 return NotFound();
 
-            role.Status = false;
-            await this.repository.PutAsync(role);
+            await this.roleRepository.DeleteAsync(role);
 
             return Ok();
         }
 
-        // DELETE: api/Roles/9a003d14b1844f3892c44efe08d12593
-        public async Task<IHttpActionResult> DeleteRole(string uuid)
+        /// <summary>
+        /// 修改角色基本信息（主要是名称和描述）。
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        [Route("api/roles/basic/{uuid}")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ModifyRoleBasic(string uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
                 return errResult;
 
-            var roles = this.repository.FindRolesByUUID(uuid);
-            await this.repository.DeleteRolesAsync(roles);
+            var roles = this.roleRepository.FindRolesByUUID(uuid);
+            if (roles == null)
+                return NotFound();
+
+            string Name = HttpContext.Current.Request.Params["Name"];
+            string Description = HttpContext.Current.Request.Params["Description"];
+            await this.roleRepository.ModifyRolesBasicAsync(roles, Name, Description);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// 修改角色状态。
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        [Route("api/roles/status/{uuid}")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ModifyRoleStatus(string uuid)
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            var roles = this.roleRepository.FindRolesByUUID(uuid);
+            if (roles == null)
+                return NotFound();
+
+            bool Status = Convert.ToBoolean(HttpContext.Current.Request.Params["Status"]);
+            await this.roleRepository.ModifyRolesStatusAsync(roles, Status);
 
             return Ok();
         }

@@ -23,6 +23,7 @@ namespace BdlIBMS.Controllers
             public string UUID { get; set; }
             public string UserName { get; set; }
             public string Password { get; set; }
+            public string RoleID { get; set; }
             public string RoleName { get; set; }
             public bool Status { get; set; }
             public string Remark { get; set; }
@@ -67,7 +68,7 @@ namespace BdlIBMS.Controllers
         }
 
         // GET: api/Users/561169739ed84672a49edadb45d01000
-        [ResponseType(typeof(User))]
+        [ResponseType(typeof(UserDTO))]
         public async Task<IHttpActionResult> GetUser(string uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
@@ -78,7 +79,16 @@ namespace BdlIBMS.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            UserDTO userDto = new UserDTO();
+            userDto.UUID = user.UUID;
+            userDto.UserName = user.UserName;
+            userDto.Password = user.Password;
+            userDto.RoleID = user.RoleID;
+            userDto.RoleName = this.roleRepository.FindRoleNameByUUID(user.RoleID);
+            userDto.Status = user.Status ?? true;
+            userDto.Remark = user.Remark;
+
+            return Ok(userDto);
         }
 
         [Route("api/Users/login")]
@@ -97,7 +107,7 @@ namespace BdlIBMS.Controllers
 
         // PUT: api/Users/561169739ed84672a49edadb45d01000
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutUser(string uuid, User user)
+        public async Task<IHttpActionResult> PutUser(string uuid, [FromUri]User user)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
@@ -108,6 +118,7 @@ namespace BdlIBMS.Controllers
 
             try
             {
+                user.Password = TextHelper.MD5Encrypt(user.Password);
                 user.Status = true;
                 await this.userRepository.PutAsync(user);
             }
@@ -165,15 +176,14 @@ namespace BdlIBMS.Controllers
             if (user == null)
                 return NotFound();
 
-            user.Status = false;
-            await this.userRepository.PutAsync(user);
+            await this.userRepository.DeleteAsync(user);
 
             return Ok();
         }
 
-        [Route("api/users/reset/{uuid}")]
-        [ResponseType(typeof(User))]
-        public async Task<IHttpActionResult> ResetUser(string uuid)
+        [Route("api/users/status/{uuid}")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ModifyUserStatus(string uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
@@ -183,10 +193,11 @@ namespace BdlIBMS.Controllers
             if (user == null)
                 return NotFound();
 
-            user.Status = true;
+            bool Status = Convert.ToBoolean(HttpContext.Current.Request.Params["Status"]);
+            user.Status = Status; // 修改该用户可用状态
             await this.userRepository.PutAsync(user);
 
-            return Ok(user);
+            return Ok();
         }
     }
 }

@@ -2,6 +2,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script type="text/javascript">
+    var activeIndexs = ["RoleManager"];
+
     app.controller('roleCtrl', function ($scope, $http) {
         // 获取角色模块数据列表
         getInfos();
@@ -18,15 +20,23 @@
             });
         }
 
-        // 删除角色
-        $scope.delete = function (uuid) {
-            ShowConfirmModal("确定删除该角色吗？", function () {
+        // 修改角色状态
+        $scope.modifyRoleStatus = function (uuid, status) {
+            var msg;
+            if (!status) {
+                msg = "确定要禁用该角色吗？";
+            } else {
+                msg = "确定要启用该角色吗？";
+            }
+
+            ShowConfirmModal(msg, function () {
                 $http({
-                    method: "delete",
+                    method: "post",
                     withCredentials: true,
-                    url: "../api/roles/" + uuid
+                    url: "../api/roles/status/" + uuid,
+                    params: { "Status": status }
                 }).success(function (data, status, headers, config) {
-                    ShowTipsModel("角色删除成功！");
+                    ShowTipsModel("角色状态修改成功！");
                     getInfos();
                 }).error(function (data, status, headers, config) {
                     ShowErrModal(data, status);
@@ -51,16 +61,20 @@
                 <th>操作</th>
             </tr>
         </thead>
-        <tbody ng-cloak ng-repeat="item in Items" ng-if="item.Status">
+        <tbody ng-cloak ng-repeat="item in Items">
             <tr>
                 <td>{{item.UUID}}</td>
                 <td>{{item.Name}}</td>
                 <td>{{item.Description}}</td>
                 <td>{{item.Remark}}</td>
-                <td>
-                    <a href="#" class="btn btn-warning">修改</a>
+                <td ng-if="item.Status">
+                    <a href="~/role/modify?uuid={{item.UUID}}" class="btn btn-warning">修改</a>
                     <a href="~/role/details?uuid={{item.UUID}}" class="btn btn-info">详情</a>
-                    <button type="button" class="btn btn-danger" ng-click="delete(item.UUID)">删除</button>
+                    <button type="button" class="btn btn-danger" ng-click="modifyRoleStatus(item.UUID,false)">禁用</button>
+                </td>
+                <td ng-if="!item.Status">
+                    <a href="~/role/details?uuid={{item.UUID}}" class="btn btn-info">详情</a>
+                    <button type="button" class="btn btn-success" ng-click="modifyRoleStatus(item.UUID,true)">启用</button>
                 </td>
             </tr>
         </tbody>

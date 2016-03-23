@@ -32,7 +32,25 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            var modules = this.repository.GetAll();
+            Pager pager = null;
+            string strPageIndex = HttpContext.Current.Request.Params["PageIndex"];
+            string strPageSize = HttpContext.Current.Request.Params["PageSize"];
+            IEnumerable<Module> modules;
+
+            if (strPageIndex == null || strPageSize == null)
+            {
+                pager = new Pager();
+                modules = this.repository.GetAll();
+            }
+            else
+            {
+                // 获取分页数据
+                int pageIndex = Convert.ToInt32(strPageIndex);
+                int pageSize = Convert.ToInt32(strPageSize);
+                pager = new Pager(pageIndex, pageSize,this.repository.GetCount());
+                modules = this.repository.GetPagerItems(pageIndex, pageSize, u => u.UUID);
+            }
+
             var items = from item in modules
                         select new
                         {
@@ -42,7 +60,9 @@ namespace BdlIBMS.Controllers
                             Status = item.Status,
                             Remark = item.Remark
                         };
-            return Ok(items);
+            pager.Items = items;
+
+            return Ok(pager);
         }
 
         // GET: api/Modules/13cbc2e968bb42a5a60a59742c8684cc
@@ -132,15 +152,14 @@ namespace BdlIBMS.Controllers
             if (module == null)
                 return NotFound();
 
-            module.Status = false; // 设置该模块不可用
-            await this.repository.PutAsync(module);
+            await this.repository.DeleteAsync(module);
 
             return Ok();
         }
 
-        [Route("api/modules/reset/{uuid}")]
-        [ResponseType(typeof(Module))]
-        public async Task<IHttpActionResult> ResetModule(string uuid)
+        [Route("api/modules/status/{uuid}")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ModifyModuleStatus(string uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
@@ -150,10 +169,11 @@ namespace BdlIBMS.Controllers
             if (module == null)
                 return NotFound();
 
-            module.Status = true; // 重置该模块为可用状态
+            bool Status = Convert.ToBoolean(HttpContext.Current.Request.Params["Status"]);
+            module.Status = Status; // 修改该模块可用状态
             await this.repository.PutAsync(module);
 
-            return Ok(module);
+            return Ok();
         }
     }
 }

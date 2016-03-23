@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -18,6 +19,12 @@ namespace BdlIBMS.Repositories
         protected IbmsContext db = new IbmsContext();
 
         public abstract DbSet<T> GetAll();
+
+        public virtual IEnumerable<T> GetPagerItems<TKey>(int pageIndex, int pageSize, Func<T, TKey> orderFunc)
+        {
+            int recordStart = (pageIndex - 1) * pageSize;
+            return GetAll().OrderBy(orderFunc).Skip(recordStart).Take(pageSize);
+        }
 
         public async virtual Task<T> GetByIdAsync(K uuid)
         {
@@ -43,6 +50,11 @@ namespace BdlIBMS.Repositories
         }
 
         public abstract bool IsExist(K uuid);
+
+        public int GetCount()
+        {
+            return GetAll().Count();
+        }
 
         protected void Dispose(bool disposing)
         {

@@ -6,7 +6,10 @@
     <meta name="renderer" content="webkit">
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.pagination.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-2.2.1.min.js"></script>
+    <script src="~/Scripts/jquery.pagination-1.2.7.min.js"></script>
+    <script src="~/Scripts/jquery.simplePagination.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
     <script src="~/Scripts/angular.min.js"></script>
     <script src="~/Scripts/init.js"></script>
@@ -21,9 +24,9 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="~/user/list" class="active">用户管理</a></li>
-                    <li><a href="~/role/list">角色管理</a></li>
-                    <li><a href="~/module/list">模块管理</a></li>
+                    <li id="UserManager"><a href="~/user/list">用户管理</a></li>
+                    <li id="RoleManager"><a href="~/role/list">角色管理</a></li>
+                    <li id="ModuleManager"><a href="~/module/list">模块管理</a></li>
                 </ul>
             </div>
         </div>

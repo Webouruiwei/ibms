@@ -7,6 +7,7 @@
     app.controller('roleCtrl', function ($scope, $http) {
         $scope.RoleName = "请选择角色！";
         getRoles();
+        getUser();
 
         // 获取所有角色
         function getRoles() {
@@ -21,8 +22,29 @@
             });
         }
 
-        // 添加用户
-        $scope.add = function () {
+        // 获取用户信息
+        function getUser() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/users/" + getQueryString("uuid")
+            }).success(function (data, status, headers, config) {
+                $scope.User = data;
+                $scope.RoleID = data.RoleID;
+                $scope.RoleName = data.RoleName;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 选择角色
+        $scope.select = function (uuid, roleName) {
+            $scope.RoleID = uuid;
+            $scope.RoleName = roleName;
+        }
+
+        // 修改用户信息
+        $scope.modifyUser = function () {
             if ($scope.RoleID == undefined) {
                 ShowTipsModel("请先选择用户角色！");
                 return;
@@ -34,31 +56,26 @@
                 "RoleID": $scope.RoleID
             };
             $http({
-                method: "post",
+                method: "put",
                 withCredentials: true,
-                url: "../api/users",
+                url: "../api/users/" + getQueryString("uuid"),
                 params: params
             }).success(function (data, status, headers, config) {
-                ShowTipsModel("用户添加成功！");
+                ShowTipsModel("用户信息修改成功！");
                 window.location.href = "../user/list";
             }).error(function (data, status, headers, config) {
                 ShowErrModal(data, status);
             });
         };
-
-        // 选择角色
-        $scope.select = function (uuid, roleName) {
-            $scope.RoleID = uuid;
-            $scope.RoleName = roleName;
-        }
     });
 </script>
 <div ng-controller="roleCtrl">
-    <h2>添加用户</h2>
+    <h2>修改用户</h2>
     <form role="form">
         <div class="form-group">
             <label for="UserName">用户名称</label>
-            <input type="text" class="form-control" id="UserName" name="UserName" placeholder="请输入用户名称！">
+            <input type="text" class="form-control" id="UserName" name="UserName" 
+                   value="{{User.UserName}}" placeholder="请输入用户名称！">
         </div>
         <div class="form-group">
             <label for="Password">用户密码</label>
@@ -81,6 +98,6 @@
             </div>
         </div>
     </form>
-    <button class="btn btn-success" ng-click="add()">添加</button><br />
+    <button class="btn btn-success" ng-click="modifyUser()">提交修改</button><br />
 </div>
 

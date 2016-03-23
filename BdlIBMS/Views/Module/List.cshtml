@@ -2,32 +2,72 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script type="text/javascript">
-    app.controller('moduleCtrl', function ($scope, $http) {
-        // 获取系统模块数据列表
-        getModuleInfos();
+    var activeIndexs = ["ModuleManager"];
 
-        function getModuleInfos() {
+    app.controller('moduleCtrl', function ($scope, $http) {
+        $scope.PageSize = 2;
+
+        var params = {
+            "PageIndex": 1,
+            "PageSize": $scope.PageSize
+        };
+
+        // 获取系统模块数据列表
+        getModuleInfos(params,true);
+
+        function getModuleInfos(params, isFirstLoadPager) {
             $http({
                 method: "get",
                 withCredentials: true,
-                url: "../api/modules"
+                url: "../api/modules",
+                params: params
             }).success(function (data, status, headers, config) {
-                $scope.Items = data;
+                $scope.Items = data.Items;
+                $scope.RecordCount = data.RecordCount;
+                if (isFirstLoadPager) {
+                    // 分页数据绑定
+                    $("#page4").page('destroy');
+                    $("#page4").page({
+                        total: $scope.RecordCount,
+                        pageSize: $scope.PageSize,
+                        firstBtnText: '首页',
+                        lastBtnText: '尾页',
+                        prevBtnText: '上一页',
+                        nextBtnText: '下一页',
+                        showInfo: false,
+                        showJump: true,
+                        jumpBtnText: '跳转'
+                    }).on("pageClicked", function (event, pageIndex) {
+                        params.PageIndex = pageIndex + 1;
+                        getModuleInfos(params, false); // 重新绑定数据
+                    }).on('jumpClicked', function (event, pageIndex) {
+                        params.PageIndex = pageIndex + 1;
+                        getModuleInfos(params, false); // 重新绑定数据
+                    });
+                }
             }).error(function (data, status, headers, config) {
                 ShowErrModal(data, status);
             });
         }
 
-        // 删除模块系统
-        $scope.deleteModule = function (uuid) {
-            ShowConfirmModal("确定删除该模块系统吗？", function () {
+        // 修正模块系统状态
+        $scope.modifyModuleStatus = function (uuid, status) {
+            var msg;
+            if (!status) {
+                msg = "确定要禁用该模块系统吗？";
+            } else {
+                msg = "确定要启用该模块系统吗？";
+            }
+
+            ShowConfirmModal(msg, function () {
                 $http({
-                    method: "delete",
+                    method: "post",
                     withCredentials: true,
-                    url: "../api/modules/" + uuid
+                    url: "../api/modules/status/" + uuid,
+                    params: { "Status": status }
                 }).success(function (data, status, headers, config) {
-                    ShowTipsModel("模块删除成功！");
-                    getModuleInfos();
+                    ShowTipsModel("模块系统状态修改成功！");
+                    getModuleInfos(params,false);
                 }).error(function (data, status, headers, config) {
                     ShowErrModal(data, status);
                 });
@@ -52,18 +92,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-cloak ng-repeat="item in Items" ng-if="item.Status">
+            <tr ng-cloak ng-repeat="item in Items">
                 <td>{{item.UUID}}</td>
                 <td>{{item.Name}}</td>
                 <td>{{item.Description}}</td>
                 <td>{{item.Remark}}</td>
-                <td>
+                <td ng-if="item.Status">
                     <a href="~/module/modify?uuid={{item.UUID}}" class="btn btn-warning">修改</a>
-                    <button type="button" class="btn btn-danger" ng-click="deleteModule(item.UUID)">删除</button>
+                    <button type="button" class="btn btn-danger" ng-click="modifyModuleStatus(item.UUID,false)">禁用</button>
+                </td>
+                <td ng-if="!item.Status">
+                    <button type="button" class="btn btn-success" ng-click="modifyModuleStatus(item.UUID,true)">启用</button>
                 </td>
             </tr>
         </tbody>
     </table>
+    <div class="width center">
+        <div id="page4" class="m-pagination" style=" width:65%; margin-left:auto; margin-right:auto;"></div>
+    </div>
 </div>
 
 
