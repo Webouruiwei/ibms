@@ -42,4 +42,11 @@ namespace BdlIBMS.Controllers
 
         public ActionResult Details() { return View(); }
     }
+
+    public class SystemController : Controller
+    {
+        public ActionResult BA() { return View(); }
+
+        public ActionResult EnergyMeter() { return View(); }
+    }
 }

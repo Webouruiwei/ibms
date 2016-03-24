@@ -62,3 +62,41 @@ app.directive('onFinishRenderFilters', function ($timeout) {
         }
     };
 });
+
+// 该控制器针对布局页面
+app.controller('layoutCtrl', function ($scope, $http) {
+    getModules();
+
+    // 获取系统所有模块
+    function getModules() {
+        $http({
+            method: "get",
+            withCredentials: true,
+            url: "../api/modules"
+        }).success(function (data, status, headers, config) {
+            $scope.LayoutModules = data.Items;
+        }).error(function (data, status, headers, config) {
+            ShowErrModal(data, status);
+        });
+    }
+
+    // 检测该登录用户是否有访问当前点击模块系统的权限
+    $scope.chkAccess = function (moduleUUID, remark) {
+        $http({
+            method: "get",
+            withCredentials: true,
+            url: "../api/users/access/" + moduleUUID
+        }).success(function (data, status, headers, config) {
+            $scope.Access = data;
+            if (!$scope.Access.CanRead) {
+                ShowModal(1,"你没有该系统的访问权限！");
+                return;
+            } else {
+                var url = "../system/" + remark + "?UUID=" + moduleUUID;
+                window.location.href = url;
+            }
+        }).error(function (data, status, headers, config) {
+            ShowErrModal(data, status);
+        });
+    }
+});

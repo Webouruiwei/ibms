@@ -42,7 +42,7 @@ namespace BdlIBMS.Controllers
                             Name = item.Name,
                             Description = item.Description,
                             Status = item.Status,
-                            Remark = item.Remark
+                            Remark = item.Remark,
                         } into newItem
                         select new
                         {
@@ -50,8 +50,9 @@ namespace BdlIBMS.Controllers
                             Name = newItem.Key.Name,
                             Description = newItem.Key.Description,
                             Status = newItem.Key.Status,
-                            Remark = newItem.Key.Remark
+                            Remark = newItem.Key.Remark,
                         };
+
             return Ok(items);
         }
 
@@ -172,6 +173,7 @@ namespace BdlIBMS.Controllers
                 role.CanRead = Convert.ToBoolean(itemAry[1]);
                 role.CanWrite = Convert.ToBoolean(itemAry[2]);
                 role.Status = true;
+                role.CreateTime = DateTime.Now;
                 if (!role.CanRead && !role.CanWrite)
                     continue;
                 await this.roleRepository.AddAsync(role);

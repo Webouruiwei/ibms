@@ -27,6 +27,7 @@ namespace BdlIBMS.Controllers
             public string RoleName { get; set; }
             public bool Status { get; set; }
             public string Remark { get; set; }
+            public DateTime? CreateTime { get; set; }
         }
 
         IUserRepository userRepository;
@@ -61,6 +62,7 @@ namespace BdlIBMS.Controllers
                 user.RoleName = this.roleRepository.FindRoleNameByUUID(item.RoleID);
                 user.Status = item.Status ?? true;
                 user.Remark = item.Remark;
+                user.CreateTime = item.CreateTime;
                 list.Add(user);
             }
 
@@ -87,6 +89,7 @@ namespace BdlIBMS.Controllers
             userDto.RoleName = this.roleRepository.FindRoleNameByUUID(user.RoleID);
             userDto.Status = user.Status ?? true;
             userDto.Remark = user.Remark;
+            userDto.CreateTime = user.CreateTime;
 
             return Ok(userDto);
         }
@@ -141,11 +144,12 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            user.UUID = TextHelper.GenerateUUID();
-            user.Password = TextHelper.MD5Encrypt(user.Password);
             try
             {
+                user.UUID = TextHelper.GenerateUUID();
+                user.Password = TextHelper.MD5Encrypt(user.Password);
                 user.Status = true;
+                user.CreateTime = DateTime.Now;
                 await this.userRepository.AddAsync(user);
 
                 UserInfo userInfo = new UserInfo();
@@ -198,6 +202,32 @@ namespace BdlIBMS.Controllers
             await this.userRepository.PutAsync(user);
 
             return Ok();
+        }
+
+        [Route("api/users/access/{moduleUUID}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> CheckUserAccess(string moduleUUID)
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            UserInfo userInfo = HttpContext.Current.Session["mySession"] as UserInfo;
+            User user = await this.userRepository.GetByIdAsync(userInfo.UUID);
+            IEnumerable<dynamic> roles = this.roleRepository.FindRolesByUUID(user.RoleID);
+            var roleAccesses = from item in roles
+                               where item.ModuleID == moduleUUID
+                               select
+                               new
+                               {
+                                   CanRead = item.CanRead,
+                                   CanWrite = item.CanWrite
+                               };
+            var roleAccess = roleAccesses.FirstOrDefault();
+            if (roleAccess == null)
+                return Ok(new { CanRead = false, CanWrite = false });
+
+            return Ok(roleAccess);
         }
     }
 }

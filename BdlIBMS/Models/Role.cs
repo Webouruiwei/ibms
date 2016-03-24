@@ -35,6 +35,8 @@ namespace BdlIBMS.Models
         [StringLength(255)]
         public string Remark { get; set; }
 
+        public DateTime? CreateTime { get; set; }
+
         public virtual Module Module { get; set; }
     }
 }

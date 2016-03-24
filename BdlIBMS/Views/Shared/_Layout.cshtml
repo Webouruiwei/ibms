@@ -12,15 +12,15 @@
     <script src="~/Scripts/jquery.simplePagination.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
     <script src="~/Scripts/angular.min.js"></script>
-    <script src="~/Scripts/init.js"></script>
     <script src="~/Scripts/utils.js"></script>
+    <script src="~/Scripts/init.js"></script>
     <title></title>
 </head>
 <body ng-app="app">
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="~/home/index">百德朗IBMS系统</a>
+                <a class="navbar-brand" href="~/home/index" id="HomeIndex">百德朗IBMS系统</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -32,8 +32,21 @@
         </div>
     </div>
     <div class="container" style="margin-top:51px;">
-        @RenderBody()
+        <div>
+            <div id="moduleNav" class="col-md-1" style="background-color:#CCEEFF;min-height:600px;" ng-controller="layoutCtrl">
+                <button type="button" class="btn btn-info btn-block btn-sm"
+                        style="margin-top:20px;" ng-repeat="item in LayoutModules" ng-if="item.Status" ng-click="chkAccess(item.UUID,item.Remark)">
+                    {{item.Name}}
+                </button>
+            </div>
+            <div class="col-md-11">
+                @RenderBody()
+            </div>
+        </div>
         <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - 百德朗IBMS系统&nbsp;<a href="/elmah.axd">ELMAH error log</a></p>
+        </footer>
         @*消息确认框*@
         <div class="modal fade" id="commontipConfirmModal">
             <div class="modal-dialog" style="width:400px;">
@@ -77,9 +90,6 @@
                 </div>
             </div>
         </div>
-        <footer>
-            <p>&copy; @DateTime.Now.Year - 百德朗IBMS系统&nbsp;<a href="/elmah.axd">ELMAH error log</a></p>
-        </footer>
     </div>
 </body>
 </html>

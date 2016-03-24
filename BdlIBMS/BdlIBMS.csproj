@@ -171,6 +171,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Properties\PublishProfiles\ibms.pubxml" />
     <Content Include="Views\User\Modify.cshtml" />
+    <None Include="Properties\PublishProfiles\kkk.pubxml" />
+    <Content Include="Views\System\BA.cshtml" />
+    <Content Include="Views\System\EnergyMeter.cshtml" />
     <None Include="Views\User\Add.cshtml" />
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
@@ -201,8 +204,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\IbmsContext.cs" />
-    <Compile Include="Models\Module.cs" />
     <Compile Include="Models\Pager.cs" />
+    <Compile Include="Models\Module.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\AbstractRespository.cs" />
     <Compile Include="Repositories\IRepository.cs" />

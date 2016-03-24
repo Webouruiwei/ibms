@@ -37,7 +37,8 @@ namespace BdlIBMS.Repositories
                                   CanRead = item.CanRead,
                                   CanWrite = item.CanWrite,
                                   Status = item.Status,
-                                  Remark = item.Remark
+                                  Remark = item.Remark,
+                                  CreateTime = item.CreateTime
                               };
             return results;
         }

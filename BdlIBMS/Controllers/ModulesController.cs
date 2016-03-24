@@ -47,8 +47,8 @@ namespace BdlIBMS.Controllers
                 // 获取分页数据
                 int pageIndex = Convert.ToInt32(strPageIndex);
                 int pageSize = Convert.ToInt32(strPageSize);
-                pager = new Pager(pageIndex, pageSize,this.repository.GetCount());
-                modules = this.repository.GetPagerItems(pageIndex, pageSize, u => u.UUID);
+                pager = new Pager(pageIndex, pageSize, this.repository.GetCount());
+                modules = this.repository.GetPagerItems(pageIndex, pageSize, u => u.CreateTime);
             }
 
             var items = from item in modules
@@ -58,7 +58,8 @@ namespace BdlIBMS.Controllers
                             Name = item.Name,
                             Description = item.Description,
                             Status = item.Status,
-                            Remark = item.Remark
+                            Remark = item.Remark,
+                            CreateTime = item.CreateTime
                         };
             pager.Items = items;
 
@@ -83,7 +84,8 @@ namespace BdlIBMS.Controllers
                 Name = module.Name,
                 Description = module.Description,
                 Status = module.Status,
-                Remark = module.Remark
+                Remark = module.Remark,
+                CreateTime = module.CreateTime
             };
 
             return Ok(result);
@@ -126,6 +128,7 @@ namespace BdlIBMS.Controllers
 
             module.UUID = BdlIBMS.Utils.TextHelper.GenerateUUID();
             module.Status = true; // 默认添加的时候该模块是可用的
+            module.CreateTime = DateTime.Now;
             try
             {
                 await this.repository.AddAsync(module);
