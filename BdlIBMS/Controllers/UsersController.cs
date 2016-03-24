@@ -94,6 +94,19 @@ namespace BdlIBMS.Controllers
             return Ok(userDto);
         }
 
+        [Route("api/user")]
+        [HttpGet]
+        [ResponseType(typeof(UserSession))]
+        public IHttpActionResult GetUserSession()
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            UserSession session = HttpContext.Current.Session["mySession"] as UserSession;
+            return Ok(session);
+        }
+
         [Route("api/Users/login")]
         [HttpGet]
         public async Task<IHttpActionResult> Login(string userName, string password)
@@ -103,8 +116,30 @@ namespace BdlIBMS.Controllers
                 return NotFound();
 
             UserInfo userInfo = await this.userInfoRepository.GetByIdAsync(user.UUID);
-            HttpContext.Current.Session["mySession"] = userInfo;
+            if (userInfo == null)
+                return NotFound();
 
+            UserSession session = new UserSession();
+            session.UUID = user.UUID;
+            session.UserName = user.UserName;
+            session.RoleID = user.RoleID;
+            session.RealName = userInfo.RealName;
+            session.Sex = userInfo.Sex;
+            session.Company = userInfo.Company;
+            session.Position = userInfo.Position;
+            session.Phone = userInfo.Phone;
+            session.Email = userInfo.Email;
+            session.Address = userInfo.Address;
+            HttpContext.Current.Session["mySession"] = session;
+
+            return Ok();
+        }
+
+        [Route("api/users/logout")]
+        [HttpPost]
+        public IHttpActionResult Logout()
+        {
+            HttpContext.Current.Session["mySession"] = null;
             return Ok();
         }
 
@@ -206,15 +241,14 @@ namespace BdlIBMS.Controllers
 
         [Route("api/users/access/{moduleUUID}")]
         [HttpGet]
-        public async Task<IHttpActionResult> CheckUserAccess(string moduleUUID)
+        public IHttpActionResult CheckUserAccess(string moduleUUID)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
                 return errResult;
 
-            UserInfo userInfo = HttpContext.Current.Session["mySession"] as UserInfo;
-            User user = await this.userRepository.GetByIdAsync(userInfo.UUID);
-            IEnumerable<dynamic> roles = this.roleRepository.FindRolesByUUID(user.RoleID);
+            UserSession session = HttpContext.Current.Session["mySession"] as UserSession;
+            IEnumerable<dynamic> roles = this.roleRepository.FindRolesByUUID(session.RoleID);
             var roleAccesses = from item in roles
                                where item.ModuleID == moduleUUID
                                select

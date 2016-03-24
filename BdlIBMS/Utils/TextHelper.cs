@@ -46,7 +46,7 @@ namespace BdlIBMS.Utils
         /// <returns></returns>
         public static bool IsSignin()
         {
-            var userInfo = HttpContext.Current.Session["mySession"] as BdlIBMS.Models.UserInfo;
+            var userInfo = HttpContext.Current.Session["mySession"] as BdlIBMS.Models.UserSession;
             return userInfo == null ? false : true;
         }
 

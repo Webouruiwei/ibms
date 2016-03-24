@@ -66,6 +66,7 @@ app.directive('onFinishRenderFilters', function ($timeout) {
 // 该控制器针对布局页面
 app.controller('layoutCtrl', function ($scope, $http) {
     getModules();
+    getUserSession();
 
     // 获取系统所有模块
     function getModules() {
@@ -79,6 +80,34 @@ app.controller('layoutCtrl', function ($scope, $http) {
             ShowErrModal(data, status);
         });
     }
+
+    // 获取用户信息
+    function getUserSession() {
+        $http({
+            method: "get",
+            withCredentials: true,
+            url: "../api/user"
+        }).success(function (data, status, headers, config) {
+            $scope.UserSession = data;
+        }).error(function (data, status, headers, config) {
+            ShowErrModal(data, status);
+        });
+    }
+
+    // 退出系统
+    $scope.logout = function () {
+        ShowConfirmModal("确定要退出系统吗？", function () {
+            $http({
+                method: "post",
+                withCredentials: true,
+                url: "../api/users/logout"
+            }).success(function (data, status, headers, config) {
+                window.location.href = "../user/login";
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        });
+    };
 
     // 检测该登录用户是否有访问当前点击模块系统的权限
     $scope.chkAccess = function (moduleUUID, remark) {
