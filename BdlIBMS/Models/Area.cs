@@ -6,34 +6,29 @@ namespace BdlIBMS.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Module")]
-    public partial class Module
+    [Table("Area")]
+    public partial class Area
     {
-        public Module()
+        public Area()
         {
-            Roles = new HashSet<Role>();
             Points = new HashSet<Point>();
         }
 
-        [Key]
-        [StringLength(32)]
-        public string UUID { get; set; }
+        public int ID { get; set; }
 
         [Required]
-        [StringLength(80)]
+        [StringLength(50)]
         public string Name { get; set; }
 
-        [StringLength(200)]
+        [StringLength(150)]
         public string Description { get; set; }
 
-        public bool? Status { get; set; }
-
-        [StringLength(255)]
-        public string Remark { get; set; }
+        public int? ParentID { get; set; }
 
         public DateTime? CreateTime { get; set; }
 
-        public virtual ICollection<Role> Roles { get; set; }
+        [StringLength(150)]
+        public string Remark { get; set; }
 
         public virtual ICollection<Point> Points { get; set; }
     }

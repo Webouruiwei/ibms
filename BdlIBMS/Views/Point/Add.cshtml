@@ -1,0 +1,178 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["PointManager"];
+
+    app.controller('pointCtrl', function ($scope, $http) {
+        $scope.ModuleName = "请选择模块系统";
+        $scope.AreaName = "请选择区域";
+        getAreas();
+        getModules();
+
+        // 获取所有区域
+        function getAreas() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/areas"
+            }).success(function (data, status, headers, config) {
+                $scope.AreaItems = data.Items;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 获取所有模块系统
+        function getModules() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/modules"
+            }).success(function (data, status, headers, config) {
+                $scope.ModuleItems = data.Items;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 添加点位
+        $scope.add = function () {
+            var params = {
+                "PointID": $("#PointID").val(),
+                "ModuleID":$scope.ModuleID,
+                "Protocol": $("#Protocol").val(),
+                "AreaID":$scope.AreaID,
+                "Floor": $("#Floor").val(),
+                "ItemID": $("#ItemID").val(),
+                "ItemName": $("#ItemName").val(),
+                "ItemDescription": $("#ItemDescription").val(),
+                "ValueFunc": $("#ValueFunc").val(),
+                "MinValue": $("#MinValue").val(),
+                "MaxValue": $("#MaxValue").val(),
+                "Type": $("#Type").val(),
+                "Unit": $("#Unit").val(),
+                "IsArchive": $("#IsArchive").is(":checked"),
+                "ArchiveInterval": $("#ArchiveInterval").val(),
+                "ParentID": $("#ParentID").val()
+            };
+            $http({
+                method: "post",
+                withCredentials: true,
+                url: "../api/points",
+                params: params
+            }).success(function (data, status, headers, config) {
+                if (status == 200)
+                    window.location.href = "../point/list";
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        };
+
+        // 选择区域
+        $scope.selectArea = function (id, areaName) {
+            $scope.AreaID = id;
+            $scope.AreaName = areaName;
+        };
+
+        // 选择模块系统
+        $scope.selectModule = function (id, moduleName) {
+            $scope.ModuleID = id;
+            $scope.ModuleName = moduleName;
+        };
+    });
+</script>
+<div ng-controller="pointCtrl">
+    <h2>添加点位</h2>
+    <form role="form">
+        <div class="form-group">
+            <label for="PointID">点位ID</label>
+            <input type="text" class="form-control" id="PointID" name="PointID" placeholder="请输入点位ID！">
+        </div>
+        <div class="form-group">
+            <label>系统选择</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{ModuleName}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-cloak ng-repeat="item in ModuleItems">
+                            <a href="#" ng-click="selectModule(item.UUID,item.Name)">{{item.Name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Protocol">采集协议</label>
+            <input type="text" class="form-control" id="Protocol" name="Protocol" placeholder="请输入采集协议！">
+        </div>
+        <div class="form-group">
+            <label>区域选择</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{AreaName}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-cloak ng-repeat="item in AreaItems">
+                            <a href="#" ng-click="selectArea(item.ID,item.Name)">{{item.Name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Floor">楼层</label>
+            <input type="text" class="form-control" id="Floor" name="Floor" placeholder="请输入楼层！">
+        </div>
+        <div class="form-group">
+            <label for="ItemID">组ID</label>
+            <input type="text" class="form-control" id="ItemID" name="ItemID" placeholder="请输入组ID！">
+        </div>
+        <div class="form-group">
+            <label for="ItemName">组名称</label>
+            <input type="text" class="form-control" id="ItemName" name="ItemName" placeholder="请输入组名称！">
+        </div>
+        <div class="form-group">
+            <label for="ItemDescription">组描述</label>
+            <input type="text" class="form-control" id="ItemDescription" name="ItemDescription" placeholder="请输入组描述！">
+        </div>
+        <div class="form-group">
+            <label for="ValueFunc">值转换函数</label>
+            <input type="text" class="form-control" id="ValueFunc" name="ValueFunc" placeholder="请输入值的转换函数！">
+        </div>
+        <div class="form-group">
+            <label for="MinValue">安全最小值</label>
+            <input type="text" class="form-control" id="MinValue" name="MinValue" placeholder="请输入安全最小值！">
+        </div>
+        <div class="form-group">
+            <label for="MaxValue">安全最大值</label>
+            <input type="text" class="form-control" id="MaxValue" name="MaxValue" placeholder="请输入安全最大值！">
+        </div>
+        <div class="form-group">
+            <label for="Type">类别</label>
+            <input type="text" class="form-control" id="Type" name="Type" placeholder="请输入类别！">
+        </div>
+        <div class="form-group">
+            <label for="Unit">单位</label>
+            <input type="text" class="form-control" id="Unit" name="Unit" placeholder="请输入单位！">
+        </div>
+        <div class="checkbox">
+            <label for="IsArchive"><input type="checkbox" id="IsArchive" name="IsArchive">是否归档</label>
+        </div>
+        <div class="form-group">
+            <label for="ArchiveInterval">归档时间间隔</label>
+            <input type="text" class="form-control" id="ArchiveInterval" name="ArchiveInterval" placeholder="请输入归档时间间隔！">
+        </div>
+        <div class="form-group">
+            <label for="ParentID">父点位ID</label>
+            <input type="text" class="form-control" id="ParentID" name="ParentID" placeholder="请输入父点位ID！">
+        </div>
+    </form>
+    <button class="btn btn-primary" ng-click="add()">添加</button><br />
+</div>
+    

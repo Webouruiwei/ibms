@@ -27,14 +27,21 @@ namespace BdlIBMS.Repositories
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        IEnumerable<T> GetPagerItems<TKey>(int pageIndex, int pageSize,Func<T,TKey> func);
+        IEnumerable<T> GetPagerItems<TKey>(int pageIndex, int pageSize, Func<T, TKey> func, bool isDesc = false);
 
         /// <summary>
-        /// 通过UUID获取指定数据项。
+        /// 异步的方式通过UUID获取指定数据项。
         /// </summary>
         /// <param name="uuid"></param>
         /// <returns></returns>
         Task<T> GetByIdAsync(K uuid);
+
+        /// <summary>
+        /// 同步的方式通过UUID获取指定数据项。
+        /// </summary>
+        /// <param name="uuid"></param>
+        /// <returns></returns>
+        T GetByID(K uuid);
 
         /// <summary>
         /// 添加数据项。

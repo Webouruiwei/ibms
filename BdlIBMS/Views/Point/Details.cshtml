@@ -1,0 +1,170 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["PointManager"];
+
+    app.controller('pointCtrl', function ($scope, $http) {
+        getInfo();
+
+        // 获取点位信息
+        function getInfo() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/points/" + getQueryString("id")
+            }).success(function (data, status, headers, config) {
+                $scope.Item = data;
+                if ($scope.Item.IsArchive) {
+                    $("#IsArchive").attr("checked", "true");
+                }
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+    });
+</script>
+<div ng-controller="pointCtrl">
+    <h2>点位详情</h2>
+    <form role="form">
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>点位ID</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.PointID}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="col-md-4">
+                    <label>系统名称</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.ModuleName}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>采集协议</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.Protocol}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="col-md-4">
+                    <label>区域名称</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.AreaName}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>楼层</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.Floor}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="col-md-4">
+                    <label>组ID</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.ItemID}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>组名称</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.ItemName}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="col-md-4">
+                    <label>组描述</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.ItemDescription}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>值转换函数</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.ValueFunc}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="col-md-4">
+                    <label>安全最小值</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.MinValue}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>安全最大值</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.MaxValue}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="col-md-4">
+                    <label>类别</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.Type}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>单位</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.Unit}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <label for="IsArchive"><input type="checkbox" id="IsArchive" name="IsArchive" readonly>是否归档</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-5">
+                <div class="col-md-4">
+                    <label>归档时间间隔</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.ArchiveInterval}}</label>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="col-md-4">
+                    <label>父点位ID</label>
+                </div>
+                <div class="col-md-8">
+                    <label>{{Item.ParentID}}</label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

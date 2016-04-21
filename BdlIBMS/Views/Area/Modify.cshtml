@@ -1,0 +1,101 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["AreaManager"];
+
+    app.controller('areaCtrl', function ($scope, $http) {
+        $scope.AreaName = "请选择父区域";
+        getAreas();
+        getInfo();
+        
+        function getInfo() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/areas/" + getQueryString("id")
+            }).success(function (data, status, headers, config) {
+                $scope.Item = data;
+                $scope.ParentID = $scope.Item.ParentID;
+                if ($scope.Item.ParentName != "") {
+                    $scope.AreaName = $scope.Item.ParentName;
+                }
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 获取所有区域
+        function getAreas() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/areas"
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data.Items;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        $scope.modify = function () {
+            var params = {
+                "ID":getQueryString("id"),
+                "Name": $("#Name").val(),
+                "Description": $("#Description").val(),
+                "ParentID": $scope.ParentID,
+                "Remark": $("#Remark").val()
+            };
+            $http({
+                method: "put",
+                withCredentials: true,
+                url: "../api/areas/" + getQueryString("id"),
+                params: params
+            }).success(function (data, status, headers, config) {
+                ShowTipsModel("区域信息修改成功！");
+                window.location.href = "../area/list";
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        };
+
+        $scope.select = function (id, areaName) {
+            $scope.ParentID = id;
+            $scope.AreaName = areaName;
+        }
+    });
+</script>
+<div ng-controller="areaCtrl">
+    <h2>修改区域</h2>
+    <form role="form">
+        <div class="form-group">
+            <label for="Name">区域名称</label>
+            <input type="text" class="form-control" id="Name" name="Name" value="{{Item.Name}}" placeholder="请输入区域名称！">
+        </div>
+        <div class="form-group">
+            <label for="Description">区域描述</label>
+            <textarea cols="30" rows="5" class="form-control" id="Description" name="Description" placeholder="请输入区域描述！">{{Item.Description}}</textarea>
+        </div>
+        <div class="form-group">
+            <label>父区域选择</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{AreaName}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-cloak ng-repeat="item in Items">
+                            <a href="#" ng-click="select(item.ID,item.Name)">{{item.Name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Remark">备注</label>
+            <textarea cols="30" rows="5" class="form-control" id="Remark" name="Remark" plac placeholder="请输入备注！">{{Item.Remark}}</textarea>
+        </div>
+    </form>
+    <button class="btn btn-primary" ng-click="modify()">修改</button><br />
+</div>

@@ -16,12 +16,21 @@ namespace BdlIBMS.Models
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserInfo> UserInfoes { get; set; }
+        public virtual DbSet<Area> Areas { get; set; }
+        public virtual DbSet<LoginRecord> LoginRecords { get; set; }
+        public virtual DbSet<OperationRecord> OperationRecords { get; set; }
+        public virtual DbSet<Point> Points { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Module>()
                 .Property(e => e.UUID)
                 .IsFixedLength();
+
+            modelBuilder.Entity<Module>()
+                .HasMany(e => e.Points)
+                .WithOptional(e => e.Module)
+                .HasForeignKey(e => e.ModuleID);
 
             modelBuilder.Entity<Module>()
                 .HasMany(e => e.Roles)
@@ -51,6 +60,10 @@ namespace BdlIBMS.Models
 
             modelBuilder.Entity<UserInfo>()
                 .Property(e => e.Phone)
+                .IsFixedLength();
+
+            modelBuilder.Entity<Point>()
+                .Property(e => e.ModuleID)
                 .IsFixedLength();
         }
     }

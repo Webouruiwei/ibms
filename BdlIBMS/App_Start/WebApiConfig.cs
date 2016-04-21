@@ -25,6 +25,8 @@ namespace BdlIBMS
             container.RegisterType<IRoleRepository, RoleRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IUserRepository, UserRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IRepository<string, UserInfo>, UserInfoRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRepository<int, Area>, AreaRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IPointRepository, PointRepository>(new HierarchicalLifetimeManager());
             config.DependencyResolver = new UnityResolver(container);
 
             // Web API 路由

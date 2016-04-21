@@ -20,15 +20,23 @@ namespace BdlIBMS.Repositories
 
         public abstract DbSet<T> GetAll();
 
-        public virtual IEnumerable<T> GetPagerItems<TKey>(int pageIndex, int pageSize, Func<T, TKey> orderFunc)
+        public virtual IEnumerable<T> GetPagerItems<TKey>(int pageIndex, int pageSize, Func<T, TKey> orderFunc, bool isDesc)
         {
             int recordStart = (pageIndex - 1) * pageSize;
-            return GetAll().OrderBy(orderFunc).Skip(recordStart).Take(pageSize);
+            if (!isDesc)
+                return GetAll().OrderBy(orderFunc).Skip(recordStart).Take(pageSize);
+            else
+                return GetAll().OrderByDescending(orderFunc).Skip(recordStart).Take(pageSize);
         }
 
         public async virtual Task<T> GetByIdAsync(K uuid)
         {
             return await GetAll().FindAsync(uuid);
+        }
+
+        public T GetByID(K uuid)
+        {
+            return GetAll().Find(uuid);
         }
 
         public async virtual Task AddAsync(T item)
