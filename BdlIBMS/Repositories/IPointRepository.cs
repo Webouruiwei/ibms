@@ -12,5 +12,7 @@ namespace BdlIBMS.Repositories
         IEnumerable<Point> GetOriginalAll();
 
         int GetOriginalCount();
+
+        IEnumerable<Point> GetAll(string moduleID, int areaID, string floor);
     }
 }

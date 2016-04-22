@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -37,6 +38,18 @@ namespace BdlIBMS.Repositories
         public int GetOriginalCount()
         {
             return GetOriginalAll().Count();
+        }
+
+        public IEnumerable<Point> GetAll(string moduleID, int areaID, string floor)
+        {
+            IEnumerable<Point> points = GetOriginalAll();
+            if (!string.IsNullOrEmpty(moduleID))
+                points = points.Where(u => u.ModuleID == moduleID);
+            if (areaID > 0)
+                points = points.Where(u => u.AreaID == areaID);
+            if (!string.IsNullOrEmpty(floor))
+                points = points.Where(u => u.Floor == floor);
+            return points;
         }
     }
 }

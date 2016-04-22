@@ -110,7 +110,7 @@ app.controller('layoutCtrl', function ($scope, $http) {
     };
 
     // 检测该登录用户是否有访问当前点击模块系统的权限
-    $scope.chkAccess = function (moduleUUID, remark) {
+    $scope.chkAccess = function (moduleUUID) {
         $http({
             method: "get",
             withCredentials: true,
@@ -121,7 +121,7 @@ app.controller('layoutCtrl', function ($scope, $http) {
                 ShowModal(1,"你没有该系统的访问权限！");
                 return;
             } else {
-                var url = "../system/" + remark + "?UUID=" + moduleUUID;
+                var url = "../system/index?UUID=" + moduleUUID;
                 window.location.href = url;
             }
         }).error(function (data, status, headers, config) {

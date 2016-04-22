@@ -1,0 +1,99 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["HomeIndex"];
+    var startX;
+    var startY;
+
+    function dragStart(ev) {
+        startX = ev.clientX;
+        startY = ev.clientY;
+        ev.dataTransfer.setData("Text", ev.target.id);
+    }
+
+    function dragEnd(ev) {
+        var x = ev.clientX - startX;
+        var y = ev.clientY - startY;
+        var offx = ev.target.offsetLeft + x;
+        var offy = ev.target.offsetTop + y;
+        ev.target.style.left = offx + "px";
+        ev.target.style.top = offy + "px";
+        var id = ev.target.id;
+        savePosition(offx, offy,id);
+    }
+
+    function savePosition(offx, offy,id) {
+        var params = {
+            "Left": offx,
+            "Top": offy
+        };
+
+        $.ajax({
+            cache: false,
+            type: "put",
+            url: "../api/points/position/" + id,
+            xhrFields: {
+                withCredentials: true
+            },
+            data: params,
+            success: function (data, textStatus, jqXHR) {
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                ShowModel("点位保存不成功！");
+            }
+        });
+    }
+
+    app.controller('baCtrl', function ($scope, $http) {
+        getPoints();
+        setInterval(getPoints, 3000);
+
+        // 获取指定模块系统的相关点位
+        function getPoints() {
+            var params = {
+                "ModuleID": getQueryString("UUID")
+            };
+
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/points/factors",
+                params: params
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 检测该登录用户是否有访问当前模块系统的控制权限
+        $scope.chkControlAccess = function () {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/users/access/" + getQueryString("UUID")
+            }).success(function (data, status, headers, config) {
+                $scope.Access = data;
+                if (!$scope.Access.CanWrite) {
+                    ShowModal(1,"你没有该系统的控制权限！");
+                    return;
+                }
+
+                ShowTipsModel("恭喜你，你拥有该系统的控制权限！");
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+    });
+</script>
+<div class="jumbotron" ng-controller="baCtrl" style="position:relative;">
+    <button type="button" class="btn btn-info" ng-cloak ng-repeat="item in Items" id="{{item.ID}}"
+            style="position:absolute;left:{{item.LeftPos}}px;top:{{item.TopPos}}px;" title="{{item.PointID}}"
+            draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+        点位值：{{item.Value}}
+    </button>
+
+    <button type="button" class="btn btn-primary" ng-click="chkControlAccess()">测试控制功能</button>
+</div>

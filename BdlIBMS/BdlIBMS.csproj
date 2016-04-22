@@ -148,6 +148,7 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Images\test.jpg" />
     <Content Include="Scripts\jquery.pagination-1.2.7.js" />
     <Content Include="Scripts\jquery.pagination-1.2.7.min.js" />
     <Content Include="Scripts\jquery.simplePagination.js" />
@@ -173,8 +174,7 @@
     <None Include="Properties\PublishProfiles\ibms.pubxml" />
     <Content Include="Views\User\Modify.cshtml" />
     <None Include="Properties\PublishProfiles\kkk.pubxml" />
-    <Content Include="Views\System\BA.cshtml" />
-    <Content Include="Views\System\EnergyMeter.cshtml" />
+    <Content Include="Views\System\Index.cshtml" />
     <Content Include="Views\Area\Add.cshtml" />
     <Content Include="Views\Area\List.cshtml" />
     <Content Include="Views\Area\Modify.cshtml" />

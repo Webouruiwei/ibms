@@ -65,8 +65,6 @@ namespace BdlIBMS.Controllers
 
     public class SystemController : Controller
     {
-        public ActionResult BA() { return View(); }
-
-        public ActionResult EnergyMeter() { return View(); }
+        public ActionResult Index() { return View(); }
     }
 }
