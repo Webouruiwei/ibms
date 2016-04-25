@@ -13,6 +13,8 @@ namespace BdlIBMS.Repositories
 
         int GetOriginalCount();
 
-        IEnumerable<Point> GetAll(string moduleID, int areaID, string floor);
+        IEnumerable<Point> GetAll(string moduleID, int areaID, string floor, bool isArchive);
+
+        IEnumerable<TrendData> GetTrendData(string pointID, DateTime startTime, DateTime endTime);
     }
 }

@@ -32,7 +32,7 @@ namespace BdlIBMS.Controllers
         public ActionResult Modify() { return View(); }
     }
 
-    public class AreaController:Controller
+    public class AreaController : Controller
     {
         public ActionResult List() { return View(); }
 
@@ -66,5 +66,7 @@ namespace BdlIBMS.Controllers
     public class SystemController : Controller
     {
         public ActionResult Index() { return View(); }
+
+        public ActionResult Trend() { return View(); }
     }
 }

@@ -1,0 +1,308 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .input_all {
+        width: 340px;
+        height: 36px;
+        font-size: 16px;
+        border: 1px solid #4c3319;
+        border-right: none;
+        background-color: #FFF;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+    }
+    .input_all_btn {
+        width: 40px;
+        height: 36px;
+        border: 1px solid #4c3319;
+        border-left: none;
+        background-color: #FFF;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+<!-- ECharts单文件引入 -->
+<script src="../Scripts/ECharts/echarts.js"></script>
+<script type="text/javascript">
+    var activeIndexs = ["TrendManager"];
+    var myChart;
+
+    // 路径配置
+    require.config({
+        paths: {
+            echarts: '../Scripts/ECharts'
+        }
+    });
+
+    // 使用
+    require(
+        [
+            'echarts',
+            'echarts/chart/line',
+            'echarts/chart/bar' // 使用柱状图就加载bar模块，按需加载
+        ],
+        function (ec) {
+            // 基于准备好的dom，初始化echarts图表 infographic为可选的主题(theme),有些主题会不显示表格
+            myChart = ec.init(document.getElementById('main'));
+        }
+    );
+
+    // 初始化并绑定事件
+    $(function () {
+        $(".form_datetime").datetimepicker({
+            language: 'zh-CN',/*加载日历语言包，可自定义*/
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 1,
+            maxView:4,
+            forceParse: 0
+        });
+
+        // 保证结束日期不能小于开始日期
+        $("#endTime").focus(function () {
+            $('#endTime').datetimepicker('setStartDate', $("#startTime").val());
+        });
+    });
+
+    app.controller('trendCtrl', function ($scope, $http) {
+        $scope.ModuleName = "请选择模块系统";
+        $scope.AreaName = "请选择区域";
+
+        getAreas();
+        getModules();
+        getPoints();
+
+        // 获取所有区域
+        function getAreas() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/areas"
+            }).success(function (data, status, headers, config) {
+                $scope.AreaItems = data.Items;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 获取所有模块系统
+        function getModules() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/modules"
+            }).success(function (data, status, headers, config) {
+                $scope.ModuleItems = data.Items;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 获取指定模块系统的相关点位
+        function getPoints() {
+            var params = {
+                "ModuleID": $scope.ModuleID,
+                "AreaID": $scope.AreaID,
+                "Floor": $scope.Floor,
+                "IsArchive": "true"
+            };
+
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/points/factors",
+                params: params
+            }).success(function (data, status, headers, config) {
+                $scope.PointItems = data;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 选择区域
+        $scope.selectArea = function (id, areaName) {
+            $scope.AreaID = id;
+            $scope.AreaName = areaName;
+            getPoints();
+        };
+
+        // 选择模块系统
+        $scope.selectModule = function (id, moduleName) {
+            $scope.ModuleID = id;
+            $scope.ModuleName = moduleName;
+            getPoints();
+        };
+
+        // 加载点位
+        $scope.loadPoints = function () {
+            getPoints();
+        };
+
+        // 趋势图分析
+        $scope.TrendAnalysis = function () {
+            // 图表清空-------------------
+            myChart.clear();
+            // 过渡---------------------
+            myChart.showLoading({
+                text: '正在努力的读取数据中...',
+            });
+
+            var points = "";
+            var first = true;
+            $("#SelectPoints :selected").each(function () {
+                if (!first) {
+                    points += ",";
+                } else {
+                    first = false;
+                }
+                points += $(this).text();
+            });
+
+            var params = {
+                "PointIDs": points,
+                "StartTime": $scope.StartTime,
+                "EndTime": $scope.EndTime
+            };
+
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/points/trend",
+                params: params
+            }).success(function (data, status, headers, config) {
+                // ajax callback
+                myChart.hideLoading();
+
+                // 图表使用-------------------
+                var option = {
+                    legend: {                                   // 图例配置
+                        padding: 5,                             // 图例内边距，单位px，默认上下左右内边距为5
+                        itemGap: 10,                             // Legend各个item之间的间隔，横向布局时为水平间隔，纵向布局时为纵向间隔
+                        data: (function () {
+                            var pointAry = points.split(",");
+                            return pointAry;
+                        })()
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            mark: { show: true },
+                            dataView: { show: true, readOnly: false },
+                            magicType: { show: true, type: ['line', 'bar'] },
+                            restore: { show: true },
+                            saveAsImage: { show: true }
+                        }
+                    },
+                    calculable: false,                          // 是否启用拖拽重计算特性，默认关闭
+                    grid: { 'y': 80, 'y2': 100 },
+                    tooltip: {                                  // 气泡提示配置
+                        trigger: 'item',                        // 触发类型，默认数据触发，可选为：'axis','item'
+                    },
+                    xAxis: [                                    // 直角坐标系中横轴数组
+                        {
+                            type: 'category',                   // 坐标轴类型，横轴默认为类目轴，数值轴则参考yAxis说明
+                            data: data.Timelines
+                        }
+                    ],
+                    yAxis: [                                    // 直角坐标系中纵轴数组
+                        {
+                            type: 'value'                       // 坐标轴类型，纵轴默认为数值轴，类目轴则参考xAxis说明
+                        }
+                    ],
+                    series: (function () {
+                        var result = [];
+                        var pointAry = points.split(",");
+                        for (var index in pointAry) {
+                            var pointID = pointAry[index];
+                            result.push({
+                                name: pointID,                            // 系列名称
+                                type: 'line',                             // 图表类型，折线图line、散点图scatter、柱状图bar、饼图pie、雷达图radar
+                                data: data.Valuelines[index]
+                            });
+                        }
+                        return result;
+                    })()
+                };
+
+                // 为echarts对象加载数据
+                myChart.setOption(option);
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        };
+    });
+</script>
+<div class="jumbotron" ng-controller="trendCtrl">
+    <div class="row">
+        <div class="col-lg-2">
+            <label>系统选择</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                        {{ModuleName}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-cloak ng-repeat="item in ModuleItems">
+                            <a href="#" ng-click="selectModule(item.UUID,item.Name)">{{item.Name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <label>区域选择</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle form-control" data-toggle="dropdown">
+                        {{AreaName}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-cloak ng-repeat="item in AreaItems">
+                            <a href="#" ng-click="selectArea(item.ID,item.Name)">{{item.Name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <label for="Floor">楼层</label>
+            <input type="text" class="form-control" id="Floor" ng-model="Floor" name="Floor" ng-mouseleave="loadPoints()" />
+        </div>
+        <div class="col-lg-2">
+            <label>点位选择</label>
+            <select multiple="multiple" size="2" id="SelectPoints" style="min-width:80px;min-height:30px;">
+                <option value="{{item.ID}}" ng-cloak ng-repeat="item in PointItems">{{item.PointID}}</option>
+            </select>
+        </div>
+        <div class="col-lg-3">
+            <label>开始日期</label>
+            <div class="input-group">
+                <input class="form-control input_all form_datetime" id="startTime" ng-model="StartTime" data-date-format="yyyy-mm-dd hh" placeholder="请输入开始日期">
+                <span class="input-group-addon input_all_btn"><img src="../images/d_r_15x16.png"></span>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <label>结束日期</label>
+            <div class="input-group">
+                <input class="form-control input_all form_datetime" id="endTime" ng-model="EndTime" data-date-format="yyyy-mm-dd hh" placeholder="请输入结束日期">
+                <span class="input-group-addon input_all_btn form_datetime"><img src="../images/d_r_15x16.png"></span>
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <button class="btn btn-primary" style="margin-top:25px;" ng-click="TrendAnalysis()">趋势图分析</button>
+        </div>
+    </div>
+</div>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="height:600px;">
+
+</div>

@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Readme\Elmah.txt" />
+    <Content Include="Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -148,7 +149,29 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Images\d_r_15x16.png" />
     <Content Include="Images\test.jpg" />
+    <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
+    <Content Include="Scripts\bootstrap-datetimepicker.zh-CN.js" />
+    <Content Include="Scripts\ECharts\chart\bar.js" />
+    <Content Include="Scripts\ECharts\chart\chord.js" />
+    <Content Include="Scripts\ECharts\chart\eventRiver.js" />
+    <Content Include="Scripts\ECharts\chart\force.js" />
+    <Content Include="Scripts\ECharts\chart\funnel.js" />
+    <Content Include="Scripts\ECharts\chart\gauge.js" />
+    <Content Include="Scripts\ECharts\chart\k.js" />
+    <Content Include="Scripts\ECharts\chart\line.js" />
+    <Content Include="Scripts\ECharts\chart\map.js" />
+    <Content Include="Scripts\ECharts\chart\pie.js" />
+    <Content Include="Scripts\ECharts\chart\radar.js" />
+    <Content Include="Scripts\ECharts\chart\scatter.js" />
+    <Content Include="Scripts\ECharts\chart\tree.js" />
+    <Content Include="Scripts\ECharts\chart\treemap.js" />
+    <Content Include="Scripts\ECharts\chart\venn.js" />
+    <Content Include="Scripts\ECharts\chart\wordCloud.js" />
+    <Content Include="Scripts\ECharts\echarts-all.js" />
+    <Content Include="Scripts\ECharts\echarts.js" />
+    <Content Include="Scripts\handlebars.js" />
     <Content Include="Scripts\jquery.pagination-1.2.7.js" />
     <Content Include="Scripts\jquery.pagination-1.2.7.min.js" />
     <Content Include="Scripts\jquery.simplePagination.js" />
@@ -182,6 +205,7 @@
     <Content Include="Views\Point\List.cshtml" />
     <Content Include="Views\Point\Modify.cshtml" />
     <Content Include="Views\Point\Details.cshtml" />
+    <Content Include="Views\System\Trend.cshtml" />
     <None Include="Views\User\Add.cshtml" />
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
@@ -218,6 +242,7 @@
     <Compile Include="Models\IbmsContext.cs" />
     <Compile Include="Models\Pager.cs" />
     <Compile Include="Models\Module.cs" />
+    <Compile Include="Models\TrendData.cs" />
     <Compile Include="Models\UserSession.cs" />
     <Compile Include="Models\OperationRecord.cs" />
     <Compile Include="Models\Point.cs" />

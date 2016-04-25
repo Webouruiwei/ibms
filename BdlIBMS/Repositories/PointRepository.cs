@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -40,9 +41,10 @@ namespace BdlIBMS.Repositories
             return GetOriginalAll().Count();
         }
 
-        public IEnumerable<Point> GetAll(string moduleID, int areaID, string floor)
+        public IEnumerable<Point> GetAll(string moduleID, int areaID, string floor, bool isArchive)
         {
             IEnumerable<Point> points = GetOriginalAll();
+            points = points.Where(u => u.IsArchive == isArchive);
             if (!string.IsNullOrEmpty(moduleID))
                 points = points.Where(u => u.ModuleID == moduleID);
             if (areaID > 0)
@@ -50,6 +52,46 @@ namespace BdlIBMS.Repositories
             if (!string.IsNullOrEmpty(floor))
                 points = points.Where(u => u.Floor == floor);
             return points;
+        }
+
+        public IEnumerable<TrendData> GetTrendData(string pointID, DateTime startTime, DateTime endTime)
+        {
+            string strSql = "";
+            TimeSpan span = endTime - startTime;
+            double days = span.TotalDays;
+            if (days > 365) // 按年统计
+            {
+                strSql = "SELECT DATEPART(YYYY,DateTime) AS Timeline, AVG(CONVERT(decimal(18, 6),Value)) AS Valueline FROM Point ";
+                strSql += "WHERE PointID= @PointID AND ArchiveTag='1' AND DateTime BETWEEN @StartTime AND @EndTime GROUP BY DATEPART(YYYY,DateTime);";
+            }
+            else if (days > 31) // 按月统计
+            {
+                strSql = "SELECT CONVERT(VARCHAR(7),DateTime,25) AS Timeline, AVG(CONVERT(decimal(18, 6),Value)) AS Valueline FROM Point ";
+                strSql += "WHERE PointID= @PointID AND ArchiveTag='1' AND DateTime BETWEEN @StartTime AND @EndTime GROUP BY CONVERT(VARCHAR(7),DateTime,25);";
+            }
+            else if (days > 1 && days <= 31) // 按天统计
+            {
+                strSql = "SELECT CONVERT(VARCHAR(10),DateTime,25) AS Timeline, AVG(CONVERT(decimal(18, 6),Value)) AS Valueline FROM Point ";
+                strSql += "WHERE PointID= @PointID AND ArchiveTag='1' AND DateTime BETWEEN @StartTime AND @EndTime GROUP BY CONVERT(VARCHAR(10),DateTime,25);";
+            }
+            else if (span.TotalHours > 1 && span.TotalHours <= 24) // 按小时统计
+            {
+                strSql = "SELECT CONVERT(varchar(10),DATEPART(HH,DateTime)) AS Timeline, AVG(CONVERT(decimal(18, 6),Value)) AS Valueline FROM Point ";
+                strSql += "WHERE PointID= @PointID AND ArchiveTag='1' AND DateTime BETWEEN @StartTime AND @EndTime GROUP BY DATEPART(HH,DateTime);";
+            }
+            else if (span.TotalMinutes > 1 && span.TotalMinutes <= 60) // 按分钟统计
+            {
+                strSql = "SELECT CONVERT(varchar(10),DATEPART(MI,DateTime)) AS Timeline, AVG(CONVERT(decimal(18, 6),Value)) AS Valueline FROM Point ";
+                strSql += "WHERE PointID= @PointID AND ArchiveTag='1' AND DateTime BETWEEN @StartTime AND @EndTime GROUP BY DATEPART(MI,DateTime);";
+            }
+
+            SqlParameter[] parameters = new SqlParameter[]{
+                new SqlParameter("@PointID", pointID),
+                new SqlParameter("@StartTime",startTime),
+                new SqlParameter("@EndTime",endTime)
+            };
+            IEnumerable<TrendData> result = db.Database.SqlQuery<TrendData>(strSql, parameters);
+            return result;
         }
     }
 }

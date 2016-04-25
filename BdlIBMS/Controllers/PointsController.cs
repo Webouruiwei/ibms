@@ -85,10 +85,14 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
+            bool IsArchive = false;
             string ModuleID = HttpContext.Current.Request.Params["ModuleID"];
             int AreaID = Convert.ToInt32(HttpContext.Current.Request.Params["AreaID"]);
             string Floor = HttpContext.Current.Request.Params["Floor"];
-            IEnumerable<Point> points = this.repository.GetAll(ModuleID, AreaID, Floor);
+            string strIsArchive = HttpContext.Current.Request.Params["IsArchive"];
+            if (!string.IsNullOrEmpty(strIsArchive))
+                IsArchive = Convert.ToBoolean(strIsArchive);
+            IEnumerable<Point> points = this.repository.GetAll(ModuleID, AreaID, Floor, IsArchive);
             var items = from item in points
                         select new
                         {
@@ -116,6 +120,44 @@ namespace BdlIBMS.Controllers
                             ArchiveInterval = item.ArchiveInterval,
                             ParentID = item.ParentID
                         };
+
+            return Ok(items);
+        }
+
+        [Route("api/points/trend")]
+        [HttpGet]
+        public IHttpActionResult GetPointsTrend()
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            string PointIDs = HttpContext.Current.Request.Params["PointIDs"];
+            DateTime StartTime = DateTime.ParseExact(HttpContext.Current.Request.Params["StartTime"], "yyyy-MM-dd HH", null);
+            DateTime EndTime = DateTime.ParseExact(HttpContext.Current.Request.Params["EndTime"], "yyyy-MM-dd HH", null);
+            string[] pointAry = PointIDs.Split(',');
+            bool first = true;
+            var timelines = new List<string>();
+            var valuelines = new List<decimal>[pointAry.Length];
+            for (int i = 0; i < pointAry.Length; i++)
+            {
+                valuelines[i] = new List<decimal>();
+                string PointID = pointAry[i];
+                IEnumerable<TrendData> datas = this.repository.GetTrendData(PointID, StartTime, EndTime);
+                foreach (TrendData data in datas)
+                {
+                    if (first)
+                        timelines.Add(data.Timeline);
+                    valuelines[i].Add(data.Valueline);
+                }
+                first = false;
+            }
+            
+            var items = new
+            {
+                Timelines = timelines,
+                Valuelines = valuelines
+            };
 
             return Ok(items);
         }

@@ -62,7 +62,9 @@
                 url: "../api/points/factors",
                 params: params
             }).success(function (data, status, headers, config) {
-                $scope.Items = data;
+                //$scope.Items = data;
+                var myTemplate = Handlebars.compile($("#template").html());
+                $('#pointContainer').html(myTemplate(data));
             }).error(function (data, status, headers, config) {
                 ShowErrModal(data, status);
             });
@@ -88,12 +90,18 @@
         }
     });
 </script>
+<script id="template" type="text/x-handlebars-template">
+    {{#each this}}
+        <button type="button" class="btn btn-info" id="{{ID}}" style="position:absolute;left:{{LeftPos}}px;top:{{TopPos}}px;" title="{{PointID}}"
+                draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+            点位值：{{Value}}
+        </button>
+    {{/each}}
+</script>
 <div class="jumbotron" ng-controller="baCtrl" style="position:relative;">
-    <button type="button" class="btn btn-info" ng-cloak ng-repeat="item in Items" id="{{item.ID}}"
-            style="position:absolute;left:{{item.LeftPos}}px;top:{{item.TopPos}}px;" title="{{item.PointID}}"
-            draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-        点位值：{{item.Value}}
-    </button>
+    <div id="pointContainer">
+
+    </div>
 
     <button type="button" class="btn btn-primary" ng-click="chkControlAccess()">测试控制功能</button>
 </div>
