@@ -48,7 +48,7 @@
 
     app.controller('baCtrl', function ($scope, $http) {
         getPoints();
-        setInterval(getPoints, 3000);
+        setInterval(getPoints, 2000);
 
         // 获取指定模块系统的相关点位
         function getPoints() {
@@ -82,8 +82,29 @@
                     ShowModal(1,"你没有该系统的控制权限！");
                     return;
                 }
+                // 向指定 PointID 的点位写值
+                writeValue();
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
 
-                ShowTipsModel("恭喜你，你拥有该系统的控制权限！");
+        // 向指定 PointID 的点位写值
+        function writeValue() {
+            var params = {
+                "PointID": $("#PointID").val(),
+                "Value": $("#Value").val()
+            };
+
+            $http({
+                method: "put",
+                withCredentials: true,
+                url: "../api/points/write",
+                params: params
+            }).success(function (data, status, headers, config) {
+                if (data) {
+                    ShowTipsModel("点位值写入完毕！");
+                }
             }).error(function (data, status, headers, config) {
                 ShowErrModal(data, status);
             });
@@ -103,5 +124,9 @@
 
     </div>
 
-    <button type="button" class="btn btn-primary" ng-click="chkControlAccess()">测试控制功能</button>
+    <div>
+        PointID:<input type="text" value="300002" id="PointID" /><br />
+        Value:<input type="text" value="2000" id="Value" /><br />
+        <button type="button" class="btn btn-primary" ng-click="chkControlAccess()">测试控制功能</button>
+    </div>
 </div>

@@ -9,6 +9,8 @@ namespace BdlIBMS.Repositories
 {
     public interface IPointRepository : IRepository<int, Point>
     {
+        Point GetByPointID(string pointID); 
+
         IEnumerable<Point> GetOriginalAll();
 
         int GetOriginalCount();

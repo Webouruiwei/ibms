@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://www.bdl.com/" elementFormDefault="qualified" targetNamespace="http://www.bdl.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="OpcWrite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="itemID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="value" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OpcWriteResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="OpcWriteResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ModbusWrite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="adr" type="xs:unsignedShort" />
+        <xs:element minOccurs="0" name="value" type="xs:unsignedShort" />
+        <xs:element minOccurs="0" name="funcode" type="xs:unsignedByte" />
+        <xs:element minOccurs="0" name="slave" type="xs:unsignedByte" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ModbusWriteResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ModbusWriteResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BacnetWrite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="itemID" type="xs:unsignedInt" />
+        <xs:element minOccurs="0" name="value" type="xs:unsignedInt" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BacnetWriteResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="BacnetWriteResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

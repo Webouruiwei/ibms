@@ -254,6 +254,57 @@ namespace BdlIBMS.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        [Route("api/points/write")]
+        [HttpPut]
+        public async Task<IHttpActionResult> PutPointWriteValue()
+        {
+            bool result = false;
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            string PointID = HttpContext.Current.Request.Params["PointID"];
+            string Value = HttpContext.Current.Request.Params["Value"];
+            Point point = this.repository.GetByPointID(PointID);
+            if (point == null)
+                return NotFound();
+            string ItemID = point.ItemID;
+            using (var proxy = new BdlIBMS.WriterService.WriterServiceClient())
+            {
+                switch (point.Protocol)
+                {
+                    case "OPC":
+                        result = proxy.OpcWrite(ItemID, Value);
+                        break;
+                    case "MODBUS":
+                        ushort usvalue = Convert.ToUInt16(Value);
+                        result = proxy.ModbusWrite(4, usvalue, 3, 1);
+                        break;
+                    case "BACNET":
+                        uint uiitemID = Convert.ToUInt32(ItemID);
+                        uint uivalue = Convert.ToUInt32(Value);
+                        result = proxy.BacnetWrite(uiitemID, uivalue);
+                        break;
+                }
+            }
+
+            // 如果写入成功，则把最新设置的值更新到数据库
+            if (result)
+            {
+                try
+                {
+                    point.Value = Value;
+                    await this.repository.PutAsync(point);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw;
+                }
+            }
+
+            return Ok(result);
+        }
+
         // POST: api/points
         [ResponseType(typeof(Point))]
         public async Task<IHttpActionResult> PostPoint([FromUri]Point point)

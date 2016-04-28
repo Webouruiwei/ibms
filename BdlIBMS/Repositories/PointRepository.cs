@@ -12,6 +12,11 @@ namespace BdlIBMS.Repositories
 {
     public class PointRepository : AbstractRespository<int, Point>, IPointRepository
     {
+        public Point GetByPointID(string pointID)
+        {
+            return (from item in GetAll() where item.PointID == pointID select item).FirstOrDefault();
+        }
+
         public override DbSet<Point> GetAll()
         {
             return db.Points;
