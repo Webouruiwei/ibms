@@ -85,14 +85,10 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            bool IsArchive = false;
             string ModuleID = HttpContext.Current.Request.Params["ModuleID"];
             int AreaID = Convert.ToInt32(HttpContext.Current.Request.Params["AreaID"]);
             string Floor = HttpContext.Current.Request.Params["Floor"];
-            string strIsArchive = HttpContext.Current.Request.Params["IsArchive"];
-            if (!string.IsNullOrEmpty(strIsArchive))
-                IsArchive = Convert.ToBoolean(strIsArchive);
-            IEnumerable<Point> points = this.repository.GetAll(ModuleID, AreaID, Floor, IsArchive);
+            IEnumerable<Point> points = this.repository.GetAll(ModuleID, AreaID, Floor);
             var items = from item in points
                         select new
                         {
@@ -277,8 +273,10 @@ namespace BdlIBMS.Controllers
                         result = proxy.OpcWrite(ItemID, Value);
                         break;
                     case "MODBUS":
+                        byte funcode = Convert.ToByte(Convert.ToInt32(ItemID[0].ToString()) - 1);
+                        ushort adr = Convert.ToUInt16(Convert.ToInt32(ItemID.Substring(1)) - 1);
                         ushort usvalue = Convert.ToUInt16(Value);
-                        result = proxy.ModbusWrite(4, usvalue, 3, 1);
+                        result = proxy.ModbusWrite(adr, usvalue, funcode, 1);
                         break;
                     case "BACNET":
                         uint uiitemID = Convert.ToUInt32(ItemID);

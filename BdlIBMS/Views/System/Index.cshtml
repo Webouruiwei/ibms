@@ -62,7 +62,6 @@
                 url: "../api/points/factors",
                 params: params
             }).success(function (data, status, headers, config) {
-                //$scope.Items = data;
                 var myTemplate = Handlebars.compile($("#template").html());
                 $('#pointContainer').html(myTemplate(data));
             }).error(function (data, status, headers, config) {
@@ -125,7 +124,7 @@
     </div>
 
     <div>
-        PointID:<input type="text" value="300002" id="PointID" /><br />
+        PointID:<input type="text" value="200001" id="PointID" /><br />
         Value:<input type="text" value="2000" id="Value" /><br />
         <button type="button" class="btn btn-primary" ng-click="chkControlAccess()">测试控制功能</button>
     </div>

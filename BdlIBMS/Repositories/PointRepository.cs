@@ -46,10 +46,9 @@ namespace BdlIBMS.Repositories
             return GetOriginalAll().Count();
         }
 
-        public IEnumerable<Point> GetAll(string moduleID, int areaID, string floor, bool isArchive)
+        public IEnumerable<Point> GetAll(string moduleID, int areaID, string floor)
         {
             IEnumerable<Point> points = GetOriginalAll();
-            points = points.Where(u => u.IsArchive == isArchive);
             if (!string.IsNullOrEmpty(moduleID))
                 points = points.Where(u => u.ModuleID == moduleID);
             if (areaID > 0)
