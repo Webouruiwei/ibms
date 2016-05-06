@@ -16,17 +16,17 @@ using BdlIBMS.Utils;
 
 namespace BdlIBMS.Controllers
 {
-    public class AreasController : ApiController
+    public class BuildingsController : ApiController
     {
-        IRepository<int, Area> repository;
+        IRepository<int, Building> repository;
 
-        public AreasController(IRepository<int, Area> repository)
+        public BuildingsController(IRepository<int, Building> repository)
         {
             this.repository = repository;
         }
 
-        // GET: api/areas
-        public IHttpActionResult GetAreas()
+        // GET: api/buildings
+        public IHttpActionResult GetBuildings()
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
@@ -35,12 +35,12 @@ namespace BdlIBMS.Controllers
             Pager pager = null;
             string strPageIndex = HttpContext.Current.Request.Params["PageIndex"];
             string strPageSize = HttpContext.Current.Request.Params["PageSize"];
-            IEnumerable<Area> areas;
+            IEnumerable<Building> buildings;
 
             if (strPageIndex == null || strPageSize == null)
             {
                 pager = new Pager();
-                areas = this.repository.GetAll();
+                buildings = this.repository.GetAll();
             }
             else
             {
@@ -48,19 +48,17 @@ namespace BdlIBMS.Controllers
                 int pageIndex = Convert.ToInt32(strPageIndex);
                 int pageSize = Convert.ToInt32(strPageSize);
                 pager = new Pager(pageIndex, pageSize, this.repository.GetCount());
-                areas = this.repository.GetPagerItems(pageIndex, pageSize, u => u.ID);
+                buildings = this.repository.GetPagerItems(pageIndex, pageSize, u => u.ID);
             }
 
-            var items = from item in areas
+            var items = from item in buildings
                         select new
                         {
                             ID = item.ID,
-                            BuildingID = item.BuildingID,
-                            BuildingName = item.Building.Name,
                             Name = item.Name,
                             Description = item.Description,
-                            ParentID = item.ParentID,
-                            ParentName = item.Area2 == null ? "" : item.Area2.Name,
+                            FloorStart = item.FloorStart,
+                            FloorEnd = item.FloorEnd,
                             CreateTime = item.CreateTime,
                             Remark = item.Remark
                         };
@@ -69,49 +67,47 @@ namespace BdlIBMS.Controllers
             return Ok(pager);
         }
 
-        // GET: api/areas/1
-        [ResponseType(typeof(Area))]
-        public async Task<IHttpActionResult> GetArea(int uuid)
+        // GET: api/buildings/1
+        [ResponseType(typeof(Building))]
+        public async Task<IHttpActionResult> GetBuilding(int uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
                 return errResult;
 
-            Area area = await this.repository.GetByIdAsync(uuid);
-            if (area == null)
+            Building building = await this.repository.GetByIdAsync(uuid);
+            if (building == null)
                 return NotFound();
 
             var result = new
             {
-                ID = area.ID,
-                BuildingID = area.BuildingID,
-                BuildingName = area.Building.Name,
-                Name = area.Name,
-                Description = area.Description,
-                ParentID = area.ParentID,
-                ParentName = area.Area2 == null ? "" : area.Area2.Name,
-                CreateTime = area.CreateTime,
-                Remark = area.Remark
+                ID = building.ID,
+                Name = building.Name,
+                Description = building.Description,
+                FloorStart = building.FloorStart,
+                FloorEnd = building.FloorEnd,
+                CreateTime = building.CreateTime,
+                Remark = building.Remark
             };
 
             return Ok(result);
         }
 
-        // PUT: api/areas/1
+        // PUT: api/buildings/1
         [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutArea(int uuid, [FromUri]Area area)
+        public async Task<IHttpActionResult> PutBuilding(int uuid, [FromUri]Building building)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
                 return errResult;
 
-            if (uuid != area.ID)
+            if (uuid != building.ID)
                 return BadRequest();
 
             try
             {
-                area.CreateTime = DateTime.Now;
-                await this.repository.PutAsync(area);
+                building.CreateTime = DateTime.Now;
+                await this.repository.PutAsync(building);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -124,9 +120,9 @@ namespace BdlIBMS.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/areas
-        [ResponseType(typeof(Area))]
-        public async Task<IHttpActionResult> PostArea([FromUri]Area area)
+        // POST: api/buildings
+        [ResponseType(typeof(Building))]
+        public async Task<IHttpActionResult> PostBuilding([FromUri]Building building)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
@@ -134,12 +130,12 @@ namespace BdlIBMS.Controllers
 
             try
             {
-                area.CreateTime = DateTime.Now;
-                await this.repository.AddAsync(area);
+                building.CreateTime = DateTime.Now;
+                await this.repository.AddAsync(building);
             }
             catch (DbUpdateException)
             {
-                if (this.repository.IsExist(area.ID))
+                if (this.repository.IsExist(building.ID))
                     return Conflict();
                 else
                     throw;
@@ -148,18 +144,18 @@ namespace BdlIBMS.Controllers
             return Ok();
         }
 
-        // DELETE: api/areas/1
-        public async Task<IHttpActionResult> DeleteArea(int uuid)
+        // DELETE: api/buildings/1
+        public async Task<IHttpActionResult> DeleteBuilding(int uuid)
         {
             var errResult = TextHelper.CheckAuthorized(Request);
             if (errResult != null)
                 return errResult;
 
-            Area area = await this.repository.GetByIdAsync(uuid);
-            if (area == null)
+            Building building = await this.repository.GetByIdAsync(uuid);
+            if (building == null)
                 return NotFound();
 
-            await this.repository.DeleteAsync(area);
+            await this.repository.DeleteAsync(building);
 
             return Ok();
         }

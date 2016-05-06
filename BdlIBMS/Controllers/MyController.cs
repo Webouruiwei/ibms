@@ -32,6 +32,15 @@ namespace BdlIBMS.Controllers
         public ActionResult Modify() { return View(); }
     }
 
+    public class BuildingController : Controller
+    {
+        public ActionResult List() { return View(); }
+
+        public ActionResult Add() { return View(); }
+
+        public ActionResult Modify() { return View(); }
+    }
+
     public class AreaController : Controller
     {
         public ActionResult List() { return View(); }

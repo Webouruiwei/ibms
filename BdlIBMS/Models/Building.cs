@@ -6,18 +6,15 @@ namespace BdlIBMS.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Area")]
-    public partial class Area
+    [Table("Building")]
+    public partial class Building
     {
-        public Area()
+        public Building()
         {
-            Area1 = new HashSet<Area>();
-            Points = new HashSet<Point>();
+            Areas = new HashSet<Area>();
         }
 
         public int ID { get; set; }
-
-        public int BuildingID { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -26,19 +23,15 @@ namespace BdlIBMS.Models
         [StringLength(150)]
         public string Description { get; set; }
 
-        public int? ParentID { get; set; }
+        public int? FloorStart { get; set; }
+
+        public int? FloorEnd { get; set; }
 
         public DateTime? CreateTime { get; set; }
 
         [StringLength(150)]
         public string Remark { get; set; }
 
-        public virtual ICollection<Area> Area1 { get; set; }
-
-        public virtual Area Area2 { get; set; }
-
-        public virtual Building Building { get; set; }
-
-        public virtual ICollection<Point> Points { get; set; }
+        public virtual ICollection<Area> Areas { get; set; }
     }
 }

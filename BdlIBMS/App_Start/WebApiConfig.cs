@@ -26,6 +26,7 @@ namespace BdlIBMS
             container.RegisterType<IUserRepository, UserRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IRepository<string, UserInfo>, UserInfoRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IRepository<int, Area>, AreaRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRepository<int, Building>, BuildingRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IPointRepository, PointRepository>(new HierarchicalLifetimeManager());
             config.DependencyResolver = new UnityResolver(container);
 

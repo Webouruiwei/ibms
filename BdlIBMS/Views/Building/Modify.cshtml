@@ -1,0 +1,70 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["BuildingManager"];
+
+    app.controller('buildingCtrl', function ($scope, $http) {
+        getInfo();
+        
+        function getInfo() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/buildings/" + getQueryString("id")
+            }).success(function (data, status, headers, config) {
+                $scope.Item = data;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        $scope.modify = function () {
+            var params = {
+                "ID":getQueryString("id"),
+                "Name": $("#Name").val(),
+                "Description": $("#Description").val(),
+                "FloorStart": $("#FloorStart").val(),
+                "FloorEnd": $("#FloorEnd").val(),
+                "Remark": $("#Remark").val()
+            };
+            $http({
+                method: "put",
+                withCredentials: true,
+                url: "../api/buildings/" + getQueryString("id"),
+                params: params
+            }).success(function (data, status, headers, config) {
+                ShowTipsModel("楼房建筑信息修改成功！");
+                window.location.href = "../building/list";
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        };
+    });
+</script>
+<div ng-controller="buildingCtrl">
+    <h2>修改楼房建筑</h2>
+    <form role="form">
+        <div class="form-group">
+            <label for="Name">建筑名称</label>
+            <input type="text" class="form-control" id="Name" name="Name" value="{{Item.Name}}" placeholder="请输入建筑名称！">
+        </div>
+        <div class="form-group">
+            <label for="Description">建筑描述</label>
+            <textarea cols="30" rows="5" class="form-control" id="Description" name="Description" placeholder="请输入建筑描述！">{{Item.Description}}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="FloorStart">楼层开始</label>
+            <input type="text" class="form-control" id="FloorStart" name="FloorStart" value="{{Item.FloorStart}}" placeholder="请输入楼层开始！">
+        </div>
+        <div class="form-group">
+            <label for="FloorEnd">楼层结束</label>
+            <input type="text" class="form-control" id="FloorEnd" name="FloorEnd" value="{{Item.FloorEnd}}" placeholder="请输入楼层结束！">
+        </div>
+        <div class="form-group">
+            <label for="Remark">备注</label>
+            <textarea cols="30" rows="5" class="form-control" id="Remark" name="Remark" plac placeholder="请输入备注！">{{Item.Remark}}</textarea>
+        </div>
+    </form>
+    <button class="btn btn-primary" ng-click="modify()">修改</button><br />
+</div>

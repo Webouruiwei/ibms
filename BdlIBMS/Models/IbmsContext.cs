@@ -16,6 +16,7 @@ namespace BdlIBMS.Models
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserInfo> UserInfoes { get; set; }
+        public virtual DbSet<Building> Buildings { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
         public virtual DbSet<LoginRecord> LoginRecords { get; set; }
         public virtual DbSet<OperationRecord> OperationRecords { get; set; }
@@ -65,6 +66,16 @@ namespace BdlIBMS.Models
             modelBuilder.Entity<Point>()
                 .Property(e => e.ModuleID)
                 .IsFixedLength();
+
+            modelBuilder.Entity<Building>()
+                .HasMany(e => e.Areas)
+                .WithRequired(e => e.Building)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Area>()
+                .HasMany(e => e.Area1)
+                .WithOptional(e => e.Area2)
+                .HasForeignKey(e => e.ParentID);
         }
     }
 }

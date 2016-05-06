@@ -6,7 +6,9 @@
 
     app.controller('areaCtrl', function ($scope, $http) {
         $scope.AreaName = "请选择父区域";
+        $scope.BuildingName = "请选择楼房建筑";
         getAreas();
+        getBuildings();
 
         // 获取所有区域
         function getAreas() {
@@ -15,14 +17,29 @@
                 withCredentials: true,
                 url: "../api/areas"
             }).success(function (data, status, headers, config) {
-                $scope.Items = data.Items;
+                $scope.AreaItems = data.Items;
             }).error(function (data, status, headers, config) {
                 ShowErrModal(data, status);
             });
         }
 
+        // 获取所有楼房建筑
+        function getBuildings() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/buildings"
+            }).success(function (data, status, headers, config) {
+                $scope.BuildingItems = data.Items;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        // 添加区域
         $scope.add = function () {
             var params = {
+                "BuildingID": $scope.BuildingID,
                 "Name": $("#Name").val(),
                 "Description": $("#Description").val(),
                 "ParentID": $scope.ParentID,
@@ -41,7 +58,14 @@
             });
         };
 
-        $scope.select = function (id, areaName) {
+        // 选择楼房建筑
+        $scope.selectBuilding = function (id, buildingName) {
+            $scope.BuildingID = id;
+            $scope.BuildingName = buildingName;
+        }
+
+        // 选择父区域
+        $scope.selectArea = function (id, areaName) {
             $scope.ParentID = id;
             $scope.AreaName = areaName;
         }
@@ -50,6 +74,22 @@
 <div ng-controller="areaCtrl">
     <h2>添加区域</h2>
     <form role="form">
+        <div class="form-group">
+            <label>建筑物选择</label>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        {{BuildingName}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-cloak ng-repeat="item in BuildingItems">
+                            <a href="#" ng-click="selectBuilding(item.ID,item.Name)">{{item.Name}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <div class="form-group">
             <label for="Name">区域名称</label>
             <input type="text" class="form-control" id="Name" name="Name" placeholder="请输入区域名称！">
@@ -67,8 +107,8 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li ng-cloak ng-repeat="item in Items">
-                            <a href="#" ng-click="select(item.ID,item.Name)">{{item.Name}}</a>
+                        <li ng-cloak ng-repeat="item in AreaItems">
+                            <a href="#" ng-click="selectArea(item.ID,item.Name)">{{item.Name}}</a>
                         </li>
                     </ul>
                 </div>

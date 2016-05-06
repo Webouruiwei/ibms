@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["BuildingManager"];
+
+    app.controller('buildingCtrl', function ($scope, $http) {
+        $scope.add = function () {
+            var params = {
+                "Name": $("#Name").val(),
+                "Description": $("#Description").val(),
+                "FloorStart": $("#FloorStart").val(),
+                "FloorEnd": $("#FloorEnd").val(),
+                "Remark": $("#Remark").val()
+            };
+            $http({
+                method: "post",
+                withCredentials: true,
+                url: "../api/buildings",
+                params: params
+            }).success(function (data, status, headers, config) {
+                if (status == 200)
+                    window.location.href = "../building/list";
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        };
+    });
+</script>
+<div ng-controller="buildingCtrl">
+    <h2>添加楼房建筑</h2>
+    <form role="form">
+        <div class="form-group">
+            <label for="Name">建筑名称</label>
+            <input type="text" class="form-control" id="Name" name="Name" placeholder="请输入建筑名称！">
+        </div>
+        <div class="form-group">
+            <label for="Description">建筑描述</label>
+            <textarea cols="30" rows="5" class="form-control" id="Description" name="Description" placeholder="请输入建筑描述！"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="FloorStart">楼层开始</label>
+            <input type="text" class="form-control" id="FloorStart" name="FloorStart" placeholder="请输入楼层开始！">
+        </div>
+        <div class="form-group">
+            <label for="FloorEnd">楼层结束</label>
+            <input type="text" class="form-control" id="FloorEnd" name="FloorEnd" placeholder="请输入楼层结束！">
+        </div>
+        <div class="form-group">
+            <label for="Remark">备注</label>
+            <textarea cols="30" rows="5" class="form-control" id="Remark" name="Remark" placeholder="请输入备注！"></textarea>
+        </div>
+    </form>
+    <button class="btn btn-primary" ng-click="add()">添加</button><br />
+</div>
+    

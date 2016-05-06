@@ -2,9 +2,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script type="text/javascript">
-    var activeIndexs = ["AreaManager"];
+    var activeIndexs = ["BuildingManager"];
 
-    app.controller('areaCtrl', function ($scope, $http) {
+    app.controller('buildingCtrl', function ($scope, $http) {
         $scope.PageSize = 2;
 
         var params = {
@@ -18,7 +18,7 @@
             $http({
                 method: "get",
                 withCredentials: true,
-                url: "../api/areas",
+                url: "../api/buildings",
                 params: params
             }).success(function (data, status, headers, config) {
                 $scope.Items = data.Items;
@@ -50,13 +50,13 @@
         }
 
         $scope.delete = function (id) {
-            ShowConfirmModal("确定要删除该区域吗？", function () {
+            ShowConfirmModal("确定要删除该楼房建筑吗？", function () {
                 $http({
                     method: "delete",
                     withCredentials: true,
-                    url: "../api/areas/" + id
+                    url: "../api/buildings/" + id
                 }).success(function (data, status, headers, config) {
-                    ShowTipsModel("区域删除成功！");
+                    ShowTipsModel("楼房建筑删除成功！");
                     getInfos(params, false);
                 }).error(function (data, status, headers, config) {
                     ShowErrModal(data, status);
@@ -66,19 +66,19 @@
     });
 </script>
 
-<div ng-controller="areaCtrl">
+<div ng-controller="buildingCtrl">
     <table class="table table-hover">
         <caption>
-            <h2>区域管理</h2>
-            <a href="~/area/add" class="btn btn-success" style="float:right;">添加</a>
+            <h2>楼房建筑管理</h2>
+            <a href="~/building/add" class="btn btn-success" style="float:right;">添加</a>
         </caption>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>楼房建筑</th>
                 <th>名称</th>
                 <th>描述</th>
-                <th>父区域</th>
+                <th>楼层开始</th>
+                <th>楼层结束</th>
                 <th>时间</th>
                 <th>备注</th>
                 <th>操作</th>
@@ -87,14 +87,14 @@
         <tbody>
             <tr ng-cloak ng-repeat="item in Items">
                 <td>{{item.ID}}</td>
-                <td>{{item.BuildingName}}</td>
                 <td>{{item.Name}}</td>
                 <td>{{item.Description}}</td>
-                <td>{{item.ParentName}}</td>
+                <td>{{item.FloorStart}}</td>
+                <td>{{item.FloorEnd}}</td>
                 <td>{{item.CreateTime}}</td>
                 <td>{{item.Remark}}</td>
                 <td>
-                    <a href="~/area/modify?id={{item.ID}}" class="btn btn-warning">修改</a>
+                    <a href="~/building/modify?id={{item.ID}}" class="btn btn-warning">修改</a>
                     <button type="button" class="btn btn-danger" ng-click="delete(item.ID)">删除</button>
                 </td>
             </tr>

@@ -53,7 +53,7 @@ namespace BdlIBMS.Repositories
                 points = points.Where(u => u.ModuleID == moduleID);
             if (areaID > 0)
                 points = points.Where(u => u.AreaID == areaID);
-            if (!string.IsNullOrEmpty(floor))
+            if (floor != null)
                 points = points.Where(u => u.Floor == floor);
             return points;
         }
