@@ -16,11 +16,14 @@ namespace BdlIBMS.Controllers
 {
     public class PointsController : ApiController
     {
-        IPointRepository repository;
+        IPointRepository pointRepository;
+        IRepository<int, OperationRecord> operationRecordRepository;
 
-        public PointsController(IPointRepository repository)
+        public PointsController(IPointRepository pointRepository,
+                                IRepository<int, OperationRecord> operationRecordRepository)
         {
-            this.repository = repository;
+            this.pointRepository = pointRepository;
+            this.operationRecordRepository = operationRecordRepository;
         }
 
         // GET: api/points
@@ -38,15 +41,15 @@ namespace BdlIBMS.Controllers
             if (strPageIndex == null || strPageSize == null)
             {
                 pager = new Pager();
-                points = this.repository.GetOriginalAll();
+                points = this.pointRepository.GetOriginalAll();
             }
             else
             {
                 // 获取分页数据
                 int pageIndex = Convert.ToInt32(strPageIndex);
                 int pageSize = Convert.ToInt32(strPageSize);
-                pager = new Pager(pageIndex, pageSize, this.repository.GetOriginalCount());
-                points = this.repository.GetPagerItems(pageIndex, pageSize, u => u.PointID);
+                pager = new Pager(pageIndex, pageSize, this.pointRepository.GetOriginalCount());
+                points = this.pointRepository.GetPagerItems(pageIndex, pageSize, u => u.PointID);
             }
 
             var items = from item in points
@@ -88,7 +91,7 @@ namespace BdlIBMS.Controllers
             string ModuleID = HttpContext.Current.Request.Params["ModuleID"];
             int AreaID = Convert.ToInt32(HttpContext.Current.Request.Params["AreaID"]);
             string Floor = HttpContext.Current.Request.Params["Floor"];
-            IEnumerable<Point> points = this.repository.GetAll(ModuleID, AreaID, Floor);
+            IEnumerable<Point> points = this.pointRepository.GetAll(ModuleID, AreaID, Floor);
             var items = from item in points
                         select new
                         {
@@ -139,7 +142,7 @@ namespace BdlIBMS.Controllers
             {
                 valuelines[i] = new List<decimal>();
                 string PointID = pointAry[i];
-                IEnumerable<TrendData> datas = this.repository.GetTrendData(PointID, StartTime, EndTime);
+                IEnumerable<TrendData> datas = this.pointRepository.GetTrendData(PointID, StartTime, EndTime);
                 foreach (TrendData data in datas)
                 {
                     if (first)
@@ -166,7 +169,7 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            Point item = await this.repository.GetByIdAsync(uuid);
+            Point item = await this.pointRepository.GetByIdAsync(uuid);
             if (item == null)
                 return NotFound();
 
@@ -209,11 +212,11 @@ namespace BdlIBMS.Controllers
 
             try
             {
-                await this.repository.PutAsync(point);
+                await this.pointRepository.PutAsync(point);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!this.repository.IsExist(uuid))
+                if (!this.pointRepository.IsExist(uuid))
                     return NotFound();
                 else
                     throw;
@@ -230,17 +233,17 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            if (!this.repository.IsExist(uuid))
+            if (!this.pointRepository.IsExist(uuid))
                 return NotFound();
 
             double Left = Convert.ToDouble(HttpContext.Current.Request.Params["Left"]);
             double Top = Convert.ToDouble(HttpContext.Current.Request.Params["Top"]);
-            Point point = await this.repository.GetByIdAsync(uuid);
+            Point point = await this.pointRepository.GetByIdAsync(uuid);
             point.LeftPos = Left;
             point.TopPos = Top;
             try
             {
-                await this.repository.PutAsync(point);
+                await this.pointRepository.PutAsync(point);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -259,31 +262,53 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
+            UserSession session = HttpContext.Current.Session["mySession"] as UserSession;
+            if (session == null)
+                return NotFound();
+
             string PointID = HttpContext.Current.Request.Params["PointID"];
             string Value = HttpContext.Current.Request.Params["Value"];
-            Point point = this.repository.GetByPointID(PointID);
+            OperationRecord operationRecord = new OperationRecord();
+            operationRecord.UserName = session.UserName;
+            operationRecord.IP = TextHelper.GetHostAddress();
+            operationRecord.DateTime = DateTime.Now;
+            operationRecord.Content = string.Format("点位ID为{0}，写入值为{1}", PointID, Value);
+            Point point = this.pointRepository.GetByPointID(PointID);
             if (point == null)
-                return NotFound();
-            string ItemID = point.ItemID;
-            using (var proxy = new BdlIBMS.WriterService.WriterServiceClient())
             {
-                switch (point.Protocol)
+                operationRecord.Result = string.Format("ID为{0}的点位不存在，写入失败！", PointID);
+                await this.operationRecordRepository.AddAsync(operationRecord);
+                return NotFound();
+            }
+
+            string ItemID = point.ItemID;
+            try
+            {
+                using (var proxy = new BdlIBMS.WriterService.WriterServiceClient())
                 {
-                    case "OPC":
-                        result = proxy.OpcWrite(ItemID, Value);
-                        break;
-                    case "MODBUS":
-                        byte funcode = Convert.ToByte(Convert.ToInt32(ItemID[0].ToString()) - 1);
-                        ushort adr = Convert.ToUInt16(Convert.ToInt32(ItemID.Substring(1)) - 1);
-                        ushort usvalue = Convert.ToUInt16(Value);
-                        result = proxy.ModbusWrite(adr, usvalue, funcode, 1);
-                        break;
-                    case "BACNET":
-                        uint uiitemID = Convert.ToUInt32(ItemID);
-                        uint uivalue = Convert.ToUInt32(Value);
-                        result = proxy.BacnetWrite(uiitemID, uivalue);
-                        break;
+                    switch (point.Protocol)
+                    {
+                        case "OPC":
+                            result = proxy.OpcWrite(ItemID, Value);
+                            break;
+                        case "MODBUS":
+                            byte funcode = Convert.ToByte(Convert.ToInt32(ItemID[0].ToString()) - 1);
+                            ushort adr = Convert.ToUInt16(Convert.ToInt32(ItemID.Substring(1)) - 1);
+                            ushort usvalue = Convert.ToUInt16(Value);
+                            result = proxy.ModbusWrite(adr, usvalue, funcode, 1);
+                            break;
+                        case "BACNET":
+                            uint uiitemID = Convert.ToUInt32(ItemID);
+                            uint uivalue = Convert.ToUInt32(Value);
+                            result = proxy.BacnetWrite(uiitemID, uivalue);
+                            break;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                result = false;
+                operationRecord.Content += ",错误内容为:" + ex.Message;
             }
 
             // 如果写入成功，则把最新设置的值更新到数据库
@@ -292,12 +317,19 @@ namespace BdlIBMS.Controllers
                 try
                 {
                     point.Value = Value;
-                    await this.repository.PutAsync(point);
+                    await this.pointRepository.PutAsync(point);
+                    operationRecord.Result = string.Format("ID为{0},ItemID为{1},协议为{2}的点位写入成功！", PointID, ItemID, point.Protocol);
+                    await this.operationRecordRepository.AddAsync(operationRecord);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     throw;
                 }
+            }
+            else
+            {
+                operationRecord.Result = string.Format("ID为{0},ItemID为{1},协议为{2}的点位写入失败！", PointID, ItemID, point.Protocol);
+                await this.operationRecordRepository.AddAsync(operationRecord);
             }
 
             return Ok(result);
@@ -319,11 +351,11 @@ namespace BdlIBMS.Controllers
                 point.DateTime = DateTime.Now;
                 point.ArchiveTime = DateTime.Now;
                 point.ArchiveTag = false;
-                await this.repository.AddAsync(point);
+                await this.pointRepository.AddAsync(point);
             }
             catch (DbUpdateException)
             {
-                if (this.repository.IsExist(point.ID))
+                if (this.pointRepository.IsExist(point.ID))
                     return Conflict();
                 else
                     throw;
@@ -339,11 +371,11 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
-            Point point = await this.repository.GetByIdAsync(uuid);
+            Point point = await this.pointRepository.GetByIdAsync(uuid);
             if (point == null)
                 return NotFound();
 
-            await this.repository.DeleteAsync(point);
+            await this.pointRepository.DeleteAsync(point);
 
             return Ok();
         }

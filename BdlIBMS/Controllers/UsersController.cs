@@ -33,15 +33,18 @@ namespace BdlIBMS.Controllers
         IUserRepository userRepository;
         IRepository<string, UserInfo> userInfoRepository;
         IRoleRepository roleRepository;
+        IRepository<int, LoginRecord> loginRecordRepository;
 
         public UsersController(
             IUserRepository userRepository,
             IRepository<string, UserInfo> userInfoRepository,
-            IRoleRepository roleRepository)
+            IRoleRepository roleRepository,
+            IRepository<int, LoginRecord> loginRecordRepository)
         {
             this.userRepository = userRepository;
             this.userInfoRepository = userInfoRepository;
             this.roleRepository = roleRepository;
+            this.loginRecordRepository = loginRecordRepository;
         }
 
         // GET: api/Users
@@ -107,17 +110,34 @@ namespace BdlIBMS.Controllers
             return Ok(session);
         }
 
-        [Route("api/Users/login")]
+        [Route("api/users/login")]
         [HttpGet]
         public async Task<IHttpActionResult> Login(string userName, string password)
         {
             User user = this.userRepository.FindByUserNameAndPassword(userName, password);
+            LoginRecord loginRecord = new LoginRecord();
+            loginRecord.UserName = userName;
+            loginRecord.IP = TextHelper.GetHostAddress();
+            loginRecord.DateTime = DateTime.Now;
             if (user == null)
+            {
+                loginRecord.Result = "登录不成功，[User]表中指定用户名不存在或密码错误！";
+                await this.loginRecordRepository.AddAsync(loginRecord);
                 return NotFound();
+            }
+                
 
             UserInfo userInfo = await this.userInfoRepository.GetByIdAsync(user.UUID);
             if (userInfo == null)
+            {
+                loginRecord.Result = "登录不成功，[UserInfo]表中指定用户名不存在或密码错误！";
+                await this.loginRecordRepository.AddAsync(loginRecord);
                 return NotFound();
+            }
+
+            // 登录成功，记录下用户登录日志
+            loginRecord.Result = "恭喜你，登录成功！";
+            await this.loginRecordRepository.AddAsync(loginRecord);
 
             UserSession session = new UserSession();
             session.UUID = user.UUID;
@@ -248,6 +268,8 @@ namespace BdlIBMS.Controllers
                 return errResult;
 
             UserSession session = HttpContext.Current.Session["mySession"] as UserSession;
+            if (session == null)
+                return NotFound();
             IEnumerable<dynamic> roles = this.roleRepository.FindRolesByUUID(session.RoleID);
             var roleAccesses = from item in roles
                                where item.ModuleID == moduleUUID

@@ -224,6 +224,8 @@
     <Content Include="Views\Building\Add.cshtml" />
     <Content Include="Views\Building\List.cshtml" />
     <Content Include="Views\Building\Modify.cshtml" />
+    <Content Include="Views\Record\LoginRecords.cshtml" />
+    <Content Include="Views\Record\OperationRecords.cshtml" />
     <None Include="Views\User\Add.cshtml" />
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
@@ -243,6 +245,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\BuildingsController.cs" />
+    <Compile Include="Controllers\OperationRecordsController.cs" />
+    <Compile Include="Controllers\LoginRecordsController.cs" />
     <Compile Include="Models\Area.cs" />
     <Compile Include="Models\Building.cs" />
     <Compile Include="Controllers\PointsController.cs" />

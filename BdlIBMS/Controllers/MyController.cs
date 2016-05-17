@@ -78,4 +78,11 @@ namespace BdlIBMS.Controllers
 
         public ActionResult Trend() { return View(); }
     }
+
+    public class RecordController : Controller
+    {
+        public ActionResult LoginRecords() { return View(); }
+
+        public ActionResult OperationRecords() { return View(); }
+    }
 }

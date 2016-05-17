@@ -1,0 +1,81 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["LoginRecordManager"];
+
+    app.controller('loginRecordCtrl', function ($scope, $http) {
+        $scope.PageSize = 10;
+
+        var params = {
+            "PageIndex": 1,
+            "PageSize": $scope.PageSize
+        };
+
+        getInfos(params, true);
+
+        function getInfos(params, isFirstLoadPager) {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/loginRecords",
+                params: params
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data.Items;
+                $scope.RecordCount = data.RecordCount;
+                if (isFirstLoadPager) {
+                    // 分页数据绑定
+                    $("#page4").page('destroy');
+                    $("#page4").page({
+                        total: $scope.RecordCount,
+                        pageSize: $scope.PageSize,
+                        firstBtnText: '首页',
+                        lastBtnText: '尾页',
+                        prevBtnText: '上一页',
+                        nextBtnText: '下一页',
+                        showInfo: false,
+                        showJump: true,
+                        jumpBtnText: '跳转'
+                    }).on("pageClicked", function (event, pageIndex) {
+                        params.PageIndex = pageIndex + 1;
+                        getInfos(params, false); // 重新绑定数据
+                    }).on('jumpClicked', function (event, pageIndex) {
+                        params.PageIndex = pageIndex + 1;
+                        getInfos(params, false); // 重新绑定数据
+                    });
+                }
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+    });
+</script>
+
+<div ng-controller="loginRecordCtrl">
+    <table class="table table-hover">
+        <caption>
+            <h2>用户登录日志</h2>
+        </caption>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>客户端IP</th>
+                <th>时间</th>
+                <th>结果</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-cloak ng-repeat="item in Items">
+                <td>{{item.ID}}</td>
+                <td>{{item.UserName}}</td>
+                <td>{{item.IP}}</td>
+                <td>{{item.DateTime}}</td>
+                <td>{{item.Result}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="width center">
+        <div id="page4" class="m-pagination" style=" width:65%; margin-left:auto; margin-right:auto;"></div>
+    </div>
+</div>
