@@ -26,6 +26,7 @@
                 "UUID": $scope.Item.UUID,
                 "Name": $("#Name").val(),
                 "Description": $("#Description").val(),
+                "RefreshInterval": $("#RefreshInterval").val(),
                 "Remark": $("#Remark").val()
             };
             $http({
@@ -52,6 +53,11 @@
         <div class="form-group">
             <label for="Description">模块描述</label>
             <textarea cols="30" rows="5" class="form-control" id="Description" name="Description" placeholder="请输入模块描述！">{{Item.Description}}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="RefreshInterval">页面刷新时间间隔</label>
+            <input type="text" class="form-control" id="RefreshInterval" name="RefreshInterval" value="{{Item.RefreshInterval}}"
+                   placeholder="请输入页面刷新时间间隔！">
         </div>
         <div class="form-group">
             <label for="Remark">备注</label>

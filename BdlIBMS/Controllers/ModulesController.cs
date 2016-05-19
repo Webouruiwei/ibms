@@ -58,6 +58,7 @@ namespace BdlIBMS.Controllers
                             Name = item.Name,
                             Description = item.Description,
                             Status = item.Status,
+                            RefreshInterval = item.RefreshInterval,
                             Remark = item.Remark,
                             CreateTime = item.CreateTime
                         };
@@ -84,6 +85,7 @@ namespace BdlIBMS.Controllers
                 Name = module.Name,
                 Description = module.Description,
                 Status = module.Status,
+                RefreshInterval = module.RefreshInterval,
                 Remark = module.Remark,
                 CreateTime = module.CreateTime
             };

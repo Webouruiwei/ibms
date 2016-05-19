@@ -74,5 +74,41 @@ namespace BdlIBMS.Controllers
 
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        [Route("api/settings/system")]
+        [HttpGet]
+        public IHttpActionResult GetSystemSetting()
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            bool IsRefresh = Convert.ToBoolean(WebConfigHelper.ReadAppSetting("IsRefresh"));
+            bool IsDraggable = Convert.ToBoolean(WebConfigHelper.ReadAppSetting("IsDraggable"));
+            var item = new
+            {
+                IsRefresh = IsRefresh,
+                IsDraggable = IsDraggable
+            };
+
+            return Ok(item);
+        }
+
+        [Route("api/settings/system")]
+        [HttpPut]
+        [ResponseType(typeof(void))]
+        public IHttpActionResult PutSystemSetting()
+        {
+            var errResult = TextHelper.CheckAuthorized(Request);
+            if (errResult != null)
+                return errResult;
+
+            string IsRefresh = HttpContext.Current.Request.Params["IsRefresh"];
+            string IsDraggable = HttpContext.Current.Request.Params["IsDraggable"];
+            WebConfigHelper.WriteAppSetting("IsRefresh", IsRefresh);
+            WebConfigHelper.WriteAppSetting("IsDraggable", IsDraggable);
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
     }
 }

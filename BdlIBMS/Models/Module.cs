@@ -28,6 +28,8 @@ namespace BdlIBMS.Models
 
         public bool? Status { get; set; }
 
+        public int? RefreshInterval { get; set; }
+
         [StringLength(255)]
         public string Remark { get; set; }
 

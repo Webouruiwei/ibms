@@ -87,6 +87,7 @@
                 <th>UUID</th>
                 <th>名称</th>
                 <th>描述</th>
+                <th>刷新时间间隔</th>
                 <th>备注</th>
                 <th>操作</th>
             </tr>
@@ -96,6 +97,7 @@
                 <td>{{item.UUID}}</td>
                 <td>{{item.Name}}</td>
                 <td>{{item.Description}}</td>
+                <td>{{item.RefreshInterval}}</td>
                 <td>{{item.Remark}}</td>
                 <td ng-if="item.Status">
                     <a href="~/module/modify?uuid={{item.UUID}}" class="btn btn-warning">修改</a>
