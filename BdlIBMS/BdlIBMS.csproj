@@ -226,6 +226,8 @@
     <Content Include="Views\Building\Modify.cshtml" />
     <Content Include="Views\Record\LoginRecords.cshtml" />
     <Content Include="Views\Record\OperationRecords.cshtml" />
+    <Content Include="Views\Setting\DbConnectSetting.cshtml" />
+    <Content Include="Views\Setting\SystemSetting.cshtml" />
     <None Include="Views\User\Add.cshtml" />
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
@@ -247,6 +249,7 @@
     <Compile Include="Controllers\BuildingsController.cs" />
     <Compile Include="Controllers\OperationRecordsController.cs" />
     <Compile Include="Controllers\LoginRecordsController.cs" />
+    <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Models\Area.cs" />
     <Compile Include="Models\Building.cs" />
     <Compile Include="Controllers\PointsController.cs" />
@@ -296,6 +299,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Utils\TextHelper.cs" />
+    <Compile Include="Utils\WebConfigHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -318,6 +322,7 @@
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\WriterService\" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

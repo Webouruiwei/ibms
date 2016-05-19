@@ -85,4 +85,11 @@ namespace BdlIBMS.Controllers
 
         public ActionResult OperationRecords() { return View(); }
     }
+
+    public class SettingController : Controller
+    {
+        public ActionResult DbConnectSetting() { return View(); }
+
+        public ActionResult SystemSetting() { return View(); }
+    }
 }
