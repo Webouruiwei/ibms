@@ -3,16 +3,21 @@
 }
 <script type="text/javascript">
     var activeIndexs = ["HomeIndex"];
+    var draggable;
     var startX;
     var startY;
 
     function dragStart(ev) {
+        if (!draggable)
+            return;
         startX = ev.clientX;
         startY = ev.clientY;
         ev.dataTransfer.setData("Text", ev.target.id);
     }
 
     function dragEnd(ev) {
+        if (!draggable)
+            return;
         var x = ev.clientX - startX;
         var y = ev.clientY - startY;
         var offx = ev.target.offsetLeft + x;
@@ -46,9 +51,31 @@
         });
     }
 
+    // 控制器
     app.controller('baCtrl', function ($scope, $http) {
-        getPoints();
-        setInterval(getPoints, 2000);
+        getSysSetting();
+
+        // 获取系统设置信息
+        function getSysSetting() {
+            var params = {
+                "ModuleID": getQueryString("UUID")
+            };
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/settings/system",
+                params: params
+            }).success(function (data, status, headers, config) {
+                var timeInterval = data.RefreshInterval;
+                draggable = data.IsDraggable;
+                getPoints();
+                if (data.IsRefresh) {
+                    setInterval(getPoints, timeInterval);
+                }
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
 
         // 获取指定模块系统的相关点位
         function getPoints() {

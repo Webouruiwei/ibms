@@ -1,4 +1,6 @@
-﻿using BdlIBMS.Utils;
+﻿using BdlIBMS.Models;
+using BdlIBMS.Repositories;
+using BdlIBMS.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,13 @@ namespace BdlIBMS.Controllers
     public class SettingsController : ApiController
     {
         private const string ConnectName = "IbmsContext";
+
+        IRepository<string, Module> moduleRepository;
+
+        public SettingsController(IRepository<string, Module> moduleRepository)
+        {
+            this.moduleRepository = moduleRepository;
+        }
 
         [Route("api/settings/dbconnect")]
         [HttpGet]
@@ -83,12 +92,18 @@ namespace BdlIBMS.Controllers
             if (errResult != null)
                 return errResult;
 
+            int? RefreshInterval = 2000;
+            string ModuleID = HttpContext.Current.Request.Params["ModuleID"];
             bool IsRefresh = Convert.ToBoolean(WebConfigHelper.ReadAppSetting("IsRefresh"));
             bool IsDraggable = Convert.ToBoolean(WebConfigHelper.ReadAppSetting("IsDraggable"));
+            if (!string.IsNullOrEmpty(ModuleID))
+                RefreshInterval = this.moduleRepository.GetByID(ModuleID).RefreshInterval;
+
             var item = new
             {
                 IsRefresh = IsRefresh,
-                IsDraggable = IsDraggable
+                IsDraggable = IsDraggable,
+                RefreshInterval = RefreshInterval
             };
 
             return Ok(item);
