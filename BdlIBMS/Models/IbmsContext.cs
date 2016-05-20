@@ -12,6 +12,7 @@ namespace BdlIBMS.Models
         {
         }
 
+        public virtual DbSet<Alarm> Alarms { get; set; }
         public virtual DbSet<Module> Modules { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -66,6 +67,11 @@ namespace BdlIBMS.Models
             modelBuilder.Entity<Point>()
                 .Property(e => e.ModuleID)
                 .IsFixedLength();
+
+            modelBuilder.Entity<Point>()
+                .HasMany(e => e.Alarms)
+                .WithRequired(e => e.Point)
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Building>()
                 .HasMany(e => e.Areas)

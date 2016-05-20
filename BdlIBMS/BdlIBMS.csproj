@@ -244,6 +244,7 @@
     <None Include="Views\User\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\Alarm.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\BuildingsController.cs" />

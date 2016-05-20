@@ -9,8 +9,14 @@ namespace BdlIBMS.Models
     [Table("Point")]
     public partial class Point
     {
+        public Point()
+        {
+            Alarms = new HashSet<Alarm>();
+        }
+
         public int ID { get; set; }
 
+        [Required]
         [StringLength(20)]
         public string PointID { get; set; }
 
@@ -74,6 +80,8 @@ namespace BdlIBMS.Models
         public bool? ArchiveTag { get; set; }
 
         public int? ParentID { get; set; }
+
+        public virtual ICollection<Alarm> Alarms { get; set; }
 
         public virtual Area Area { get; set; }
 
