@@ -30,6 +30,7 @@ namespace BdlIBMS
             container.RegisterType<IPointRepository, PointRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IRepository<int,LoginRecord>, LoginRecordRepository>(new HierarchicalLifetimeManager());
             container.RegisterType<IRepository<int, OperationRecord>, OperationRecordRepository>(new HierarchicalLifetimeManager());
+            container.RegisterType<IRepository<int, Alarm>, AlarmRepository>(new HierarchicalLifetimeManager());
             config.DependencyResolver = new UnityResolver(container);
 
             // Web API 路由

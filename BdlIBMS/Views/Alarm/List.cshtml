@@ -1,0 +1,90 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["AlarmRecord"];
+
+    app.controller('alarmCtrl', function ($scope, $http) {
+        $scope.PageSize = 10;
+
+        var params = {
+            "PageIndex": 1,
+            "PageSize": $scope.PageSize
+        };
+
+        getInfos(params, true);
+
+        function getInfos(params, isFirstLoadPager) {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/alarms",
+                params: params
+            }).success(function (data, status, headers, config) {
+                $scope.Items = data.Items;
+                $scope.RecordCount = data.RecordCount;
+                if (isFirstLoadPager) {
+                    // 分页数据绑定
+                    $("#page4").page('destroy');
+                    $("#page4").page({
+                        total: $scope.RecordCount,
+                        pageSize: $scope.PageSize,
+                        firstBtnText: '首页',
+                        lastBtnText: '尾页',
+                        prevBtnText: '上一页',
+                        nextBtnText: '下一页',
+                        showInfo: false,
+                        showJump: true,
+                        jumpBtnText: '跳转'
+                    }).on("pageClicked", function (event, pageIndex) {
+                        params.PageIndex = pageIndex + 1;
+                        getInfos(params, false); // 重新绑定数据
+                    }).on('jumpClicked', function (event, pageIndex) {
+                        params.PageIndex = pageIndex + 1;
+                        getInfos(params, false); // 重新绑定数据
+                    });
+                }
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+    });
+</script>
+
+<div ng-controller="alarmCtrl">
+    <table class="table table-hover">
+        <caption>
+            <h2>报警信息列表</h2>
+        </caption>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>点位ID</th>
+                <th>系统名称</th>
+                <th>点位标识</th>
+                <th>报警等级</th>
+                <th>是否已处理</th>
+                <th>触发时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-cloak ng-repeat="item in Items">
+                <td>{{item.ID}}</td>
+                <td>{{item.PointID}}</td>
+                <td>{{item.ModuleName}}</td>
+                <td>{{item.ItemName}}</td>
+                <td>{{item.Priority}}</td>
+                <td>{{item.IsProcess}}</td>
+                <td>{{item.OccurTime}}</td>
+                <td>
+                    <a ng-if="!item.IsProcess" href="~/alarm/modify?id={{item.ID}}" class="btn btn-warning">修改</a>
+                    <a href="~/alarm/details?id={{item.ID}}" class="btn btn-info">详情</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="width center">
+        <div id="page4" class="m-pagination" style=" width:65%; margin-left:auto; margin-right:auto;"></div>
+    </div>
+</div>

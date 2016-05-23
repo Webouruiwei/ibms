@@ -92,4 +92,13 @@ namespace BdlIBMS.Controllers
 
         public ActionResult SystemSetting() { return View(); }
     }
+
+    public class AlarmController : Controller
+    {
+        public ActionResult List() { return View(); }
+
+        public ActionResult Modify() { return View(); }
+
+        public ActionResult Details() { return View(); }
+    }
 }

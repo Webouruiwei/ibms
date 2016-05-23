@@ -228,6 +228,9 @@
     <Content Include="Views\Record\OperationRecords.cshtml" />
     <Content Include="Views\Setting\DbConnectSetting.cshtml" />
     <Content Include="Views\Setting\SystemSetting.cshtml" />
+    <Content Include="Views\Alarm\Details.cshtml" />
+    <Content Include="Views\Alarm\List.cshtml" />
+    <Content Include="Views\Alarm\Modify.cshtml" />
     <None Include="Views\User\Add.cshtml" />
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
@@ -244,6 +247,7 @@
     <None Include="Views\User\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AlarmsController.cs" />
     <Compile Include="Models\Alarm.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
@@ -276,6 +280,7 @@
     <Compile Include="Models\OperationRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\AbstractRespository.cs" />
+    <Compile Include="Repositories\AlarmRepository.cs" />
     <Compile Include="Repositories\BuildingRepository.cs" />
     <Compile Include="Repositories\IPointRepository.cs" />
     <Compile Include="Repositories\PointRepository.cs" />

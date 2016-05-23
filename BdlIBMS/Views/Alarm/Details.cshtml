@@ -1,0 +1,74 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["AlarmRecord"];
+
+    app.controller('alarmCtrl', function ($scope, $http) {
+        getInfos();
+
+        // 获取报警详情
+        function getInfos() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/alarms/" + getQueryString("id")
+            }).success(function (data, status, headers, config) {
+                $scope.Item = data;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+    });
+</script>
+<div ng-controller="alarmCtrl">
+    <h2>{{Item.ItemName}}</h2><br />
+    <div role="form">
+        <div class="form-group">
+            <label>点位ID</label>&nbsp;&nbsp;<span>{{Item.PointID}}</span>
+        </div>
+        <div class="form-group">
+            <label>系统名称</label>&nbsp;&nbsp;<span>{{Item.ModuleName}}</span>
+        </div>
+        <div class="form-group">
+            <label>报警等级</label>&nbsp;&nbsp;<span>{{Item.Priority}}</span>
+        </div>
+        <div class="form-group">
+            <label>故障原因</label>&nbsp;&nbsp;<span>{{Item.Reason}}</span>
+        </div>
+        <div class="form-group">
+            <label>故障发生时间</label>&nbsp;&nbsp;<span>{{Item.OccurTime}}</span>
+        </div>
+        <div class="form-group">
+            <label>是否已经处理</label>&nbsp;&nbsp;
+            <span ng-if="Item.IsProcess">
+                <input type="checkbox" checked disabled/>
+            </span>
+            <span ng-if="!Item.IsProcess">
+                <input type="checkbox" disabled/>
+            </span>
+        </div>
+        <div class="form-group">
+            <label>责任人</label>&nbsp;&nbsp;<span>{{Item.Principal}}</span>
+        </div>
+        <div class="form-group">
+            <label>处理内容</label>&nbsp;&nbsp;<span>{{Item.ProcessContent}}</span>
+        </div>
+        <div class="form-group">
+            <label>是否已经处理成功</label>&nbsp;&nbsp;
+            <span ng-if="Item.IsSuccess">
+                <input type="checkbox" checked disabled/>
+            </span>
+            <span ng-if="!Item.IsSuccess">
+                <input type="checkbox" disabled/>
+            </span>
+        </div>
+        <div class="form-group">
+            <label>处理时间</label>&nbsp;&nbsp;<span>{{Item.ProcessTime}}</span>
+        </div>
+        <div class="form-group">
+            <label>备注</label>&nbsp;&nbsp;<span>{{Item.Remark}}</span>
+        </div>
+    </div>
+</div>
+    

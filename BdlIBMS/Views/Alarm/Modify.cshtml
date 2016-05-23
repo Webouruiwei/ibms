@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var activeIndexs = ["AlarmRecord"];
+
+    app.controller('alarmCtrl', function ($scope, $http) {
+        getInfo();
+
+        function getInfo() {
+            $http({
+                method: "get",
+                withCredentials: true,
+                url: "../api/alarms/" + getQueryString("id")
+            }).success(function (data, status, headers, config) {
+                $scope.Item = data;
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        }
+
+        $scope.modify = function () {
+            var params = {
+                "ID": getQueryString("id"),
+                "Principal": $("#Principal").val(),
+                "ProcessContent": $("#ProcessContent").val(),
+                "IsSuccess": $("#IsSuccess").is(':checked') ,
+                "Remark": $("#Remark").val()
+            };
+            $http({
+                method: "put",
+                withCredentials: true,
+                url: "../api/alarms/" + getQueryString("id"),
+                params: params
+            }).success(function (data, status, headers, config) {
+                ShowTipsModel("报警信息已经处理完毕！");
+                window.location.href = "../alarm/list";
+            }).error(function (data, status, headers, config) {
+                ShowErrModal(data, status);
+            });
+        };
+    });
+</script>
+<div ng-controller="alarmCtrl">
+    <h2>报警处理</h2>
+    <form role="form">
+        <div class="form-group">
+            <label for="Principal">处理负责人</label>
+            <input type="text" class="form-control" id="Principal" value="{{Item.Principal}}">
+        </div>
+        <div class="form-group">
+            <label for="ProcessContent">处理内容</label>
+            <textarea cols="30" rows="5" class="form-control" id="ProcessContent">{{Item.ProcessContent}}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="IsSuccess">是否处理成功</label>&nbsp;
+            <input type="checkbox" id="IsSuccess">
+        </div>
+        <div class="form-group">
+            <label for="Remark">备注</label>
+            <textarea cols="30" rows="5" class="form-control" id="Remark">{{Item.Remark}}</textarea>
+        </div>
+    </form>
+    <button class="btn btn-primary" ng-click="modify()">修改</button><br />
+</div>
