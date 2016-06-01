@@ -101,4 +101,11 @@ namespace BdlIBMS.Controllers
 
         public ActionResult Details() { return View(); }
     }
+
+    public class WindowController : Controller
+    {
+        public ActionResult Index() { return View(); }
+
+        public ActionResult Ajax() { return View(); }
+    }
 }

@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/kendo.common.min.css" rel="stylesheet">
+<link href="~/Content/kendo.default.min.css" rel="stylesheet">
+<script src="~/Scripts/kendo.all.min.js"></script>
+
+<div id="example" style="min-height: 840px;position:absolute;">
+    <div id="window"></div>
+    <script>
+        $(function () {
+            var wnd = $("#window").data("kendoWindow");
+            if (!wnd) {
+                wnd = $("#window").kendoWindow({
+                    width: "1000px",
+                    height: "600px",
+                    position: {
+                        top: "0px",
+                        left:"200px"
+                    },
+                    title: "Rams's Ten Principles of Good Design",
+                    actions: ["Minimize", "Maximize", "Close"],
+                    content: rootUrl + "role/list",
+                    animation: false,
+                    visible: false,
+                    modal: true
+                }).data("kendoWindow");
+            }
+            wnd.open();
+        });
+    </script>
+</div>

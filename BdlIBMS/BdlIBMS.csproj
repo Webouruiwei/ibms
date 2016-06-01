@@ -140,9 +140,26 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Default\editor.png" />
+    <Content Include="Content\Default\imagebrowser.png" />
+    <Content Include="Content\Default\indeterminate.gif" />
+    <Content Include="Content\Default\loading-image.gif" />
+    <Content Include="Content\Default\loading.gif" />
+    <Content Include="Content\Default\loading_2x.gif" />
+    <Content Include="Content\Default\markers.png" />
+    <Content Include="Content\Default\markers_2x.png" />
+    <Content Include="Content\Default\slider-h.gif" />
+    <Content Include="Content\Default\slider-v.gif" />
+    <Content Include="Content\Default\sprite.png" />
+    <Content Include="Content\Default\sprite_2x.png" />
+    <Content Include="Content\Default\sprite_kpi.png" />
+    <Content Include="Content\Default\sprite_kpi_2x.png" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\index.css" />
     <Content Include="Content\jquery.pagination.css" />
+    <Content Include="Content\kendo.common.min.css" />
+    <Content Include="Content\kendo.default.min.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -150,7 +167,9 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Images\1_list.png" />
     <Content Include="Images\d_r_15x16.png" />
+    <Content Include="Images\iii.jpg" />
     <Content Include="Images\test.jpg" />
     <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.zh-CN.js" />
@@ -176,6 +195,7 @@
     <Content Include="Scripts\jquery.pagination-1.2.7.js" />
     <Content Include="Scripts\jquery.pagination-1.2.7.min.js" />
     <Content Include="Scripts\jquery.simplePagination.js" />
+    <Content Include="Scripts\kendo.all.min.js" />
     <Content Include="Scripts\utils.js" />
     <None Include="Service References\WriterService\configuration91.svcinfo" />
     <None Include="Service References\WriterService\configuration.svcinfo" />
@@ -231,6 +251,7 @@
     <Content Include="Views\Alarm\Details.cshtml" />
     <Content Include="Views\Alarm\List.cshtml" />
     <Content Include="Views\Alarm\Modify.cshtml" />
+    <Content Include="Views\Shared\_Header.cshtml" />
     <None Include="Views\User\Add.cshtml" />
     <Content Include="Scripts\angular-mocks.js" />
     <Content Include="Scripts\angular-route.js" />
@@ -315,6 +336,8 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
+    <Content Include="Views\Window\Index.cshtml" />
+    <Content Include="Views\Window\Ajax.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,7 +1,8 @@
+var rootUrl = "http://localhost:3893/";
 var app = angular.module('app', [], function ($httpProvider) {
-    for (var index in activeIndexs) {
-        $("#" + activeIndexs[index]).addClass("active");
-    }
+    //for (var index in activeIndexs) {
+    //    $("#" + activeIndexs[index]).addClass("active");
+    //}
 
     // Use x-www-form-urlencoded Content-Type 修改请求头
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';

@@ -1,9 +1,8 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Header.cshtml";
 }
 <script type="text/javascript">
-    var activeIndexs = ["SysSetting", "RoleManager"];
-
+    // 角色控制器
     app.controller('roleCtrl', function ($scope, $http) {
         // 获取角色模块数据列表
         getInfos();
@@ -80,6 +79,3 @@
         </tbody>
     </table>
 </div>
-
-
-    

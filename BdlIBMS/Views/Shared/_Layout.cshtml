@@ -9,6 +9,7 @@
     <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
     <link href="~/Content/jquery.pagination.css" rel="stylesheet" />
     <link href="~/Content/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <link href="~/Content/index.css" rel="stylesheet" />
     <script src="~/Scripts/jquery-2.2.1.min.js"></script>
     <script src="~/Scripts/jquery.pagination-1.2.7.min.js"></script>
     <script src="~/Scripts/jquery.simplePagination.js"></script>
@@ -19,67 +20,266 @@
     <script src="~/Scripts/init.js"></script>
     <script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
     <script src="~/Scripts/bootstrap-datetimepicker.zh-CN.js"></script>
-    <title></title>
+    <script type="text/javascript">
+        //左侧
+        function showmenu(id) {
+            var list = document.getElementById("list" + id);
+            var menu = document.getElementById("menu" + id);
+            if (list.style.display == "none") {
+                document.getElementById("list" + id).style.display = "block";
+            } else {
+                document.getElementById("list" + id).style.display = "none";
+            }
+        }
+
+        $(document).ready(function () {
+            $("#firstpane .menu_body:eq(0)").hide();
+            $("#firstpane h3.menu_head").click(function () {
+                $(this).addClass("current").next("div.menu_body").slideToggle(300).siblings("div.menu_body").slideUp("slow");
+                $(this).siblings().removeClass("current");
+            });
+
+            $("#secondpane .menu_body:eq(0)").show();
+            $("#secondpane h3.menu_head").mouseover(function () {
+                $(this).addClass("current").next("div.menu_body").slideDown(500).siblings("div.menu_body").slideUp("slow");
+                $(this).siblings().removeClass("current");
+            });
+
+            $(".icons>a>span").click(function () {
+                var $div = $(".content");
+                if ($div.is(":hidden")) {
+                    $(".content").fadeIn("3000");
+                    $(".icons>a>span").text(">>");
+                } else {
+                    $(".content").fadeOut("3000");
+                    $(".icons>a>span").text("<<");
+                }
+            });
+        });
+    </script>
+    <title>系统首页</title>
 </head>
 <body ng-app="app" ng-controller="layoutCtrl">
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="~/home/index" id="HomeIndex">百德朗IBMS系统</a>
+    <div class="nav">
+        <div>
+            <ul>
+                <li class="left_first">
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />空调系统
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />电力监控
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />抄表系统
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />发电机系统
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />风机盘管
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />泛光照明
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />锅炉
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="~/Images/1_list.png" alt="Alternate Text" /><br />冷源群控
+                    </a>
+                </li>
+                <li class="dropdown right_last">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        {{UserSession.UserName}} <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" ng-click="logout()">退出</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div> 
+    </div>
+    <div class="auto">
+        <div id="firstpane" class="menu_list">
+            <div class="log">
+                <a href="~/home/index">百德朗IBMS系统</a>
             </div>
-            <div class="navbar-collapse collapse">
-                <!--向左对齐-->
-                <ul class="nav navbar-nav navbar-left">
-                    @*基础信息*@
-                    <li class="dropdown" id="BasicInfo">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">基础信息 <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li id="ModuleManager"><a href="~/module/list">子系统管理</a></li>
-                            <li id="BuildingManager"><a href="~/building/list">楼房信息管理</a></li>
-                            <li id="AreaManager"><a href="~/area/list">区域管理</a></li>
-                            <li id="PointManager"><a href="~/point/list">点位管理</a></li>
-                        </ul>
-                    </li>
-                    @*系统设置*@
-                    <li class="dropdown" id="SysSetting">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">系统设置 <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li id="RoleManager"><a href="~/role/list">角色管理</a></li>
-                            <li id="UserManager"><a href="~/user/list">用户管理</a></li>
-                            <li id="DbConnectManager"><a href="~/setting/dbConnectSetting">数据库连接设置</a></li>
-                            <li id="SysSettingManager"><a href="~/setting/systemSetting">系统参数设置</a></li>
-                        </ul>
-                    </li>
-                    @*日志分析*@
-                    <li class="dropdown" id="LogAnalysis">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">日志分析 <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li id="LoginRecordManager"><a href="~/record/loginRecords">登录日志</a></li>
-                            <li id="OperationRecordManager"><a href="~/record/operationRecords">操作日志</a></li>
-                        </ul>
-                    </li>
-                    @*报警记录*@
-                    <li id="AlarmRecord"><a href="~/alarm/list">报警记录</a></li>
-                    @*统计报表*@
-                    <li id="AnalysisReport"><a href="#">统计报表</a></li>
-                    @*趋势图分析*@
-                    <li id="TrendManager"><a href="~/system/trend">趋势图分析</a></li>
+            <h3 class="menu_head current">
+                BAS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
+            </h3>
+            <div style="display: block" class="menu_body">
+                <a href="#">主页</a> 
+                <a href="#">1F</a> 
+                <a href="#">2F</a> 
+                <a href="#">2U</a>
+                <a href="#">3F</a>
+                <a href="#">4F</a> 
+                <a href="#">4J</a> 
+                <a href="#">B1</a><a href="#">27UF</a>
+                <a href="#">29F</a>
+                <a href="#">K-1厨房K-2F厨房</a>
+                <a href="#">K-3F厨房</a>
+                <a href="#">K-4F厨房</a>
+            </div>
+            <h3 class="menu_head">
+                SCADA&nbsp;&nbsp;&nbsp;&nbsp;>
+            </h3>
+            <div style="display: none" class="menu_body">
+                <a href="#">应用经济学</a>
+                <a href="#">理论经济学</a>
+                <a href="#">国民经济学</a>
+                <a href="#">区域经济学</a>
+                <a href="#">产业经济学</a>
+                <a href="#">国际贸易学</a>
+                <a href="#">劳动经济学</a>
+                <a href="#">政治经济学</a>
+            </div>
+            <h3 class="menu_head">
+                AMR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
+            </h3>
+            <div style="display: none" class="menu_body">
+                <a href="#">马克思主义基本原理</a> 
+                <a href="#">马克思主义发展史</a> 
+                <a href="#">马克思主义中国化研究</a> 
+                <a href="#">国外马克思主义研究</a> 
+                <a href="#">思想政治教育</a>
+            </div>
+            <h3 class="menu_head">
+                PRKG &nbsp;&nbsp;&nbsp;&nbsp;>
+            </h3>
+            <div style="display: none" class="menu_body">
+                <a href="#">体育人文社会学</a> 
+                <a href="#">体育教育训练学</a> 
+                <a href="#">民族传统体育学</a> 
+                <a href="#">发展与教育心理学</a> 
+                <a href="#">比较教育学</a>
+            </div>
+            <h3 class="menu_head">
+                FCU&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
+            </h3>
+            <div style="display: none" class="menu_body">
+                <a href="#">一般力学与力学基础</a> 
+                <a href="#">固体力学</a> 
+                <a href="#">流体力学</a> 
+                <a href="#">工程力学</a>
+                <a href="#">机械制造及其自动化</a> 
+                <a href="#">机械电子工程</a>
+            </div>
+        </div>
+        <div class="img">
+            <img src="~/Images/iii.jpg" alt="Alternate Text" />
+            @RenderBody()
+        </div>
+    </div>
+    <div class="aside">
+        <div class="content" style="">
+            <div id="menu1" onclick="showmenu(1)">
+                <a href="#">基础信息</a>
+            </div>
+            <div id="list1" style="display: none;">
+                <ul>
+                    <li id="ModuleManager"><a href="">子系统管理</a></li>
+                    <li id="BuildingManager"><a href="~/building/list">楼房信息管理</a></li>
+                    <li id="AreaManager"><a href="~/area/list">区域管理</a></li>
+                    <li id="PointManager"><a href="~/point/list">点位管理</a></li>
                 </ul>
-                <!--向右对齐-->
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            {{UserSession.UserName}} <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" ng-click="logout()">退出</a></li>
-                        </ul>
-                    </li>
+            </div>
+            <div id="menu2" onclick="showmenu(2)">
+                <a href="#">系统设置</a>
+            </div>
+            <div id="list2" style="display: none;">
+                <ul>
+                    <li id="RoleManager"><a href="~/role/list">角色管理</a></li>
+                    <li id="UserManager"><a href="~/user/list">用户管理</a></li>
+                    <li id="DbConnectManager"><a href="~/setting/dbConnectSetting">数据库连接设置</a></li>
+                    <li id="SysSettingManager"><a href="~/setting/systemSetting">系统参数设置</a></li>
                 </ul>
+            </div>
+            <div id="menu3" onclick="showmenu(3)">
+                <a href="#">日志分析</a>
+            </div>
+            <div id="list3" style="display: none;">
+                <ul>
+                    <li id="LoginRecordManager"><a href="~/record/loginRecords">登录日志</a></li>
+                    <li id="OperationRecordManager"><a href="~/record/operationRecords">操作日志</a></li>
+                </ul>
+            </div>
+            <div>
+                <a href="~/alarm/list">报警记录</a>
+            </div>
+            <div>
+                <a href="#">统计报表</a>
+            </div>
+            <div>
+                <a href="~/system/trend">趋势图分析</a>
+            </div>
+        </div>
+        <div class="icons">
+            <a href="#"><span><<</span></a>
+        </div>
+    </div>
+    @*<footer style="float:left;">
+        <p>&copy; @DateTime.Now.Year - 百德朗IBMS系统&nbsp;<a href="/elmah.axd">ELMAH error log</a></p>
+    </footer>*@
+    @*消息确认框*@
+    <div class="modal fade" id="commontipConfirmModal">
+        <div class="modal-dialog" style="width:400px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">
+                        <i class="fa fa-exclamation-triangle"></i><span style="margin-left: 2px;">警告</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <p id="showConfirmTitle"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" style="height: 36px;"
+                            data-dismiss="modal" id="cancelConfirmPop">
+                        取消
+                    </button>
+                    <button type="button" class="btn  btn-primary" style="height: 36px;" id="confirmPop">确定</button>
+                </div>
             </div>
         </div>
     </div>
-    <div class="container" style="margin-top:51px;">
+    @*消息提示框*@
+    <div class="modal fade" id="commontiperrModal">
+        <div class="modal-dialog" style="width:400px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="model-msg-title"><i class="fa fa-times-circle"></i><span style="margin-left: 2px;">错误提示</span></h4>
+                </div>
+                <div class="modal-body">
+                    <p id="showerrTitle" style="font-size: 16px;"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="modelClose" style="height: 36px;"
+                            data-dismiss="modal">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="container" style="margin-top:51px;">
         <div>
             <div id="moduleNav" class="col-md-1" style="background-color:#CCEEFF;min-height:600px;">
                 <button type="button" class="btn btn-info btn-block btn-sm"
@@ -92,52 +292,6 @@
             </div>
         </div>
         <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - 百德朗IBMS系统&nbsp;<a href="/elmah.axd">ELMAH error log</a></p>
-        </footer>
-        @*消息确认框*@
-        <div class="modal fade" id="commontipConfirmModal">
-            <div class="modal-dialog" style="width:400px;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">
-                            <i class="fa fa-exclamation-triangle"></i><span style="margin-left: 2px;">警告</span>
-                        </h4>
-                    </div>
-                    <div class="modal-body">
-                        <p id="showConfirmTitle"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" style="height: 36px;"
-                                data-dismiss="modal" id="cancelConfirmPop">
-                            取消
-                        </button>
-                        <button type="button" class="btn  btn-primary" style="height: 36px;" id="confirmPop">确定</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @*消息提示框*@
-        <div class="modal fade" id="commontiperrModal">
-            <div class="modal-dialog" style="width:400px;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="model-msg-title"><i class="fa fa-times-circle"></i><span style="margin-left: 2px;">错误提示</span></h4>
-                    </div>
-                    <div class="modal-body">
-                        <p id="showerrTitle" style="font-size: 16px;"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id="modelClose" style="height: 36px;"
-                                data-dismiss="modal">
-                            关闭
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div>*@
 </body>
 </html>
